@@ -31,9 +31,17 @@ public partial class HoaDon
 
     public string? TrangThai { get; set; }
 
+    public int? ChiSoTieuThu { get; set; }
+
+    public int? ChiSoCu { get; set; }
+
+    public int? ChiSoMoi { get; set; }
+
     public virtual ChiTietSddien? MaChiTietSddienNavigation { get; set; }
 
     public virtual KhachHang? MaKhNavigation { get; set; }
 
     public virtual NhanVien? MaNvNavigation { get; set; }
+
+    public virtual ICollection<ThongBao> ThongBaos { get; set; } = new List<ThongBao>();
 }

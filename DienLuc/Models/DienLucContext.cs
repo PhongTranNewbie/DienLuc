@@ -27,6 +27,10 @@ public partial class DienLucContext : DbContext
 
     public virtual DbSet<TaiKhoan> TaiKhoans { get; set; }
 
+    public virtual DbSet<ThongBao> ThongBaos { get; set; }
+
+    public virtual DbSet<VaiTro> VaiTros { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=MSI\\SQLSEVER2022DEV;Database=DienLuc;trusted_connection=yes;Encrypt=True;TrustServerCertificate=True;");
@@ -153,6 +157,9 @@ public partial class DienLucContext : DbContext
             entity.Property(e => e.MaThue)
                 .HasMaxLength(10)
                 .IsFixedLength();
+            entity.Property(e => e.MaVaiTro)
+                .HasMaxLength(10)
+                .IsFixedLength();
             entity.Property(e => e.Matk)
                 .HasMaxLength(25)
                 .IsFixedLength()
@@ -162,6 +169,10 @@ public partial class DienLucContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("SoDT");
             entity.Property(e => e.Ten).HasMaxLength(25);
+
+            entity.HasOne(d => d.MaVaiTroNavigation).WithMany(p => p.KhachHangs)
+                .HasForeignKey(d => d.MaVaiTro)
+                .HasConstraintName("FK_KhachHang_VaiTro");
 
             entity.HasOne(d => d.MatkNavigation).WithOne(p => p.KhachHang)
                 .HasForeignKey<KhachHang>(d => d.Matk)
@@ -216,6 +227,33 @@ public partial class DienLucContext : DbContext
             entity.Property(e => e.Mk)
                 .HasMaxLength(25)
                 .HasColumnName("MK");
+        });
+
+        modelBuilder.Entity<ThongBao>(entity =>
+        {
+            entity.ToTable("ThongBao");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.MaHd)
+                .HasMaxLength(10)
+                .IsFixedLength()
+                .HasColumnName("MaHD");
+
+            entity.HasOne(d => d.MaHdNavigation).WithMany(p => p.ThongBaos)
+                .HasForeignKey(d => d.MaHd)
+                .HasConstraintName("FK_ThongBao_HoaDon");
+        });
+
+        modelBuilder.Entity<VaiTro>(entity =>
+        {
+            entity.ToTable("VaiTro");
+
+            entity.HasIndex(e => e.ViTri, "IX_VaiTro").IsUnique();
+
+            entity.Property(e => e.Id)
+                .HasMaxLength(10)
+                .IsFixedLength();
+            entity.Property(e => e.ViTri).HasMaxLength(50);
         });
 
         OnModelCreatingPartial(modelBuilder);
