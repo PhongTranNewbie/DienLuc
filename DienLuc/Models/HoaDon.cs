@@ -9,23 +9,21 @@ public partial class HoaDon
 
     public string? MaNv { get; set; }
 
-    public string? MaKh { get; set; }
-
     public int? MaChiTietSddien { get; set; }
 
     public DateTime? NgayTao { get; set; }
 
     public DateTime? NgayDenHan { get; set; }
 
-    public string? NgayThanhToan { get; set; }
+    public DateTime? NgayThanhToan { get; set; }
 
     public decimal? Thue { get; set; }
 
-    public int? SoNo { get; set; }
+    public decimal? SoNo { get; set; }
 
-    public int? SoTienCanThanhToan { get; set; }
+    public decimal? SoTienCanThanhToan { get; set; }
 
-    public int? SoTienDaThanhToan { get; set; }
+    public decimal? SoTienDaThanhToan { get; set; }
 
     public string? HinhThucThanhToan { get; set; }
 
@@ -38,8 +36,6 @@ public partial class HoaDon
     public int? ChiSoMoi { get; set; }
 
     public virtual ChiTietSddien? MaChiTietSddienNavigation { get; set; }
-
-    public virtual KhachHang? MaKhNavigation { get; set; }
 
     public virtual NhanVien? MaNvNavigation { get; set; }
 

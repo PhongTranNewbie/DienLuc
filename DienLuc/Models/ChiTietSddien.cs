@@ -13,7 +13,7 @@ public partial class ChiTietSddien
 
     public string MaNv { get; set; } = null!;
 
-    public int? ChiSoDien { get; set; }
+    public int ChiSoDien { get; set; }
 
     public virtual HoaDon? HoaDon { get; set; }
 

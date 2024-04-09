@@ -105,30 +105,23 @@ public partial class DienLucContext : DbContext
                 .HasColumnName("MaHD");
             entity.Property(e => e.HinhThucThanhToan).HasMaxLength(50);
             entity.Property(e => e.MaChiTietSddien).HasColumnName("MaChiTietSDDien");
-            entity.Property(e => e.MaKh)
-                .HasMaxLength(10)
-                .IsFixedLength()
-                .HasColumnName("MaKH");
             entity.Property(e => e.MaNv)
                 .HasMaxLength(10)
                 .IsFixedLength()
                 .HasColumnName("MaNV");
             entity.Property(e => e.NgayDenHan).HasColumnType("datetime");
             entity.Property(e => e.NgayTao).HasColumnType("datetime");
-            entity.Property(e => e.NgayThanhToan)
-                .HasMaxLength(10)
-                .IsFixedLength();
-            entity.Property(e => e.Thue).HasColumnType("decimal(10, 0)");
+            entity.Property(e => e.NgayThanhToan).HasColumnType("datetime");
+            entity.Property(e => e.SoNo).HasColumnType("decimal(12, 0)");
+            entity.Property(e => e.SoTienCanThanhToan).HasColumnType("decimal(12, 0)");
+            entity.Property(e => e.SoTienDaThanhToan).HasColumnType("decimal(12, 0)");
+            entity.Property(e => e.Thue).HasColumnType("decimal(12, 0)");
             entity.Property(e => e.TrangThai).HasMaxLength(50);
 
             entity.HasOne(d => d.MaChiTietSddienNavigation).WithOne(p => p.HoaDon)
                 .HasPrincipalKey<ChiTietSddien>(p => p.Id)
                 .HasForeignKey<HoaDon>(d => d.MaChiTietSddien)
                 .HasConstraintName("FK_HoaDon_ChiTietSDDien");
-
-            entity.HasOne(d => d.MaKhNavigation).WithMany(p => p.HoaDons)
-                .HasForeignKey(d => d.MaKh)
-                .HasConstraintName("FK_HoaDon_KhachHang");
 
             entity.HasOne(d => d.MaNvNavigation).WithMany(p => p.HoaDons)
                 .HasForeignKey(d => d.MaNv)
@@ -150,9 +143,6 @@ public partial class DienLucContext : DbContext
             entity.Property(e => e.Cccd)
                 .HasMaxLength(12)
                 .HasColumnName("CCCD");
-            entity.Property(e => e.DiaChi)
-                .HasMaxLength(10)
-                .IsFixedLength();
             entity.Property(e => e.Ho).HasMaxLength(25);
             entity.Property(e => e.MaThue)
                 .HasMaxLength(10)
@@ -195,7 +185,6 @@ public partial class DienLucContext : DbContext
                 .HasMaxLength(12)
                 .IsFixedLength()
                 .HasColumnName("CCCD");
-            entity.Property(e => e.DiaChi).HasMaxLength(55);
             entity.Property(e => e.Ho).HasMaxLength(25);
             entity.Property(e => e.Matk)
                 .HasMaxLength(25)

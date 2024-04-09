@@ -26,6 +26,20 @@ namespace DienLuc.Controllers
         }
 
         // GET: ChiTietSddiens/Details/5
+        public IActionResult GetChiSoCu(string maDh)
+        {
+            // Lấy chi tiết sử dụng điện của đồng hồ được chọn cho tháng trước
+            var lastMonth = DateTime.Now.AddMonths(-1);
+            var chiTietCu = _context.ChiTietSddiens
+                .Where(c => c.MaDh == maDh && c.NgayLayThongTin.Year == lastMonth.Year && c.NgayLayThongTin.Month == lastMonth.Month)
+                .OrderByDescending(c => c.NgayLayThongTin)
+                .FirstOrDefault();
+
+            // Trả về chỉ số điện của tháng trước nếu có, ngược lại trả về 0
+            var chiSoCu = chiTietCu != null ? chiTietCu.ChiSoDien : 0;
+
+            return Content(chiSoCu.ToString());
+        }
         public async Task<IActionResult> Details(int id)
         {
             if (id == null)
@@ -58,7 +72,7 @@ namespace DienLuc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,MaDh,NgayLayThongTin,MaNv,ChiSoCu,ChiSoMoi,ChiSoTieuThu")] ChiTietSddien chiTietSddien)
+        public async Task<IActionResult> Create([Bind("Id,MaDh,NgayLayThongTin,MaNv,ChiSoDien")] ChiTietSddien chiTietSddien)
         {
             var maxChiTiet = _context.ChiTietSddiens
         .Where(c => c.MaDh == chiTietSddien.MaDh)
@@ -80,16 +94,15 @@ namespace DienLuc.Controllers
                     return View(chiTietSddien);
                 }
             }
-            var existingRecord = _context.ChiTietSddiens.FirstOrDefault(c => c.MaDh == chiTietSddien.MaDh
-                                                                  && c.NgayLayThongTin.Month == chiTietSddien.NgayLayThongTin.Month
-                                                                  && c.NgayLayThongTin.Year == chiTietSddien.NgayLayThongTin.Year);
-            if (existingRecord != null)
+            
+            
+            var lastestCsd = _context.ChiTietSddiens.Where(c => c.MaDh == chiTietSddien.MaDh).OrderByDescending(c => c.NgayLayThongTin).Select(c => c.ChiSoDien).FirstOrDefault();
+            if(lastestCsd > chiTietSddien.ChiSoDien)
             {
-                ModelState.AddModelError(string.Empty, "Chi tiết sử dụng điện cho mã đồng hồ này trong tháng và năm này đã tồn tại.");
+                ModelState.AddModelError(string.Empty, $"Chỉ số điện không được bé hơn chi số điện tháng trước là {lastestCsd}.");
                 // Trả về view với model để hiển thị thông báo lỗi cho người dùng
                 return View(chiTietSddien);
             }
-            chiTietSddien.ChiSoTieuThu = chiTietSddien.ChiSoMoi - chiTietSddien.ChiSoCu;
                 _context.Add(chiTietSddien);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -116,23 +129,14 @@ namespace DienLuc.Controllers
             ViewData["MaNv"] = new SelectList(_context.NhanViens, "MaNv", "MaNv", chiTietSddien.MaNv);
             return View(chiTietSddien);
         }
-        [HttpGet]
-        public IActionResult GetChiSoCu(string maDh)
-        {
-            var chiSoCu = _context.ChiTietSddiens
-                                .Where(c => c.MaDh == maDh)
-                                .OrderByDescending(c => c.NgayLayThongTin)
-                                .Select(c => c.ChiSoMoi)
-                                .FirstOrDefault();
-            return Json(chiSoCu);
-        }
+        
 
         // POST: ChiTietSddiens/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MaDh,NgayLayThongTin,MaNv,ChiSoCu,ChiSoMoi,ChiSoTieuThu")] ChiTietSddien chiTietSddien)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,MaDh,NgayLayThongTin,MaNv,ChiSoDien")] ChiTietSddien chiTietSddien)
         {
             if (id != chiTietSddien.Id)
             {
@@ -143,7 +147,7 @@ namespace DienLuc.Controllers
             {
                 try
                 {
-                    chiTietSddien.ChiSoTieuThu = chiTietSddien.ChiSoMoi - chiTietSddien.ChiSoCu;
+                    
                     _context.Update(chiTietSddien);
                     await _context.SaveChangesAsync();
                 }

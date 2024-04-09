@@ -27,23 +27,11 @@
                 <select asp-for="MaNv" class ="form-control" asp-items="ViewBag.MaNv"></select>
             </div>
             <div class="form-group">
-                <label asp-for="ChiSoCu" class="control-label" ></label>
-                <input asp-for="ChiSoCu" class="form-control" readonly />
-                <span asp-validation-for="ChiSoCu" class="text-danger"></span>
+                <label asp-for="ChiSoDien" class="control-label" ></label>
+                <input asp-for="ChiSoDien" class="form-control"  />
+                <span asp-validation-for="ChiSoDien" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ChiSoMoi" class="control-label"></label>
-                <input asp-for="ChiSoMoi" class="form-control" />
-                <span asp-validation-for="ChiSoMoi" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ChiSoTieuThu" class="control-label"></label>
-                <input asp-for="ChiSoTieuThu" class="form-control" />
-                <span asp-validation-for="ChiSoTieuThu" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
+            
         </form>
     </div>
 </div>
@@ -54,30 +42,8 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
-        $(document).ready(function () {
-            $('form').submit(function (event) {
-                var chiSoMoi = parseInt($('#ChiSoMoi').val());
-                var chiSoCu = parseInt($('#ChiSoCu').val());
-                if (chiSoMoi < chiSoCu) {
-                    alert("Chỉ số mới không thể nhỏ hơn chỉ số cũ.");
-                    event.preventDefault(); // Ngăn chặn việc submit form
-                }
-            });
-        });
+    
 
-        function getChiSoCu(select) {
-            var maDh = select.value;
-            $.ajax({
-                url: '/ChiTietSddiens/GetChiSoCu',
-                type: 'GET',
-                data: { maDh: maDh },
-                success: function (result) {
-                    $('#ChiSoCu').val(result);
-                }
-            });
-        }
-    </script>
 
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
