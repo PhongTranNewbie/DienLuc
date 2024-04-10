@@ -23,13 +23,13 @@ public partial class DienLucContext : DbContext
 
     public virtual DbSet<KhachHang> KhachHangs { get; set; }
 
+    public virtual DbSet<LoaiTaiKhoan> LoaiTaiKhoans { get; set; }
+
     public virtual DbSet<NhanVien> NhanViens { get; set; }
 
     public virtual DbSet<TaiKhoan> TaiKhoans { get; set; }
 
     public virtual DbSet<ThongBao> ThongBaos { get; set; }
-
-    public virtual DbSet<VaiTro> VaiTros { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -147,9 +147,6 @@ public partial class DienLucContext : DbContext
             entity.Property(e => e.MaThue)
                 .HasMaxLength(10)
                 .IsFixedLength();
-            entity.Property(e => e.MaVaiTro)
-                .HasMaxLength(10)
-                .IsFixedLength();
             entity.Property(e => e.Matk)
                 .HasMaxLength(25)
                 .IsFixedLength()
@@ -160,13 +157,23 @@ public partial class DienLucContext : DbContext
                 .HasColumnName("SoDT");
             entity.Property(e => e.Ten).HasMaxLength(25);
 
-            entity.HasOne(d => d.MaVaiTroNavigation).WithMany(p => p.KhachHangs)
-                .HasForeignKey(d => d.MaVaiTro)
-                .HasConstraintName("FK_KhachHang_VaiTro");
-
             entity.HasOne(d => d.MatkNavigation).WithOne(p => p.KhachHang)
                 .HasForeignKey<KhachHang>(d => d.Matk)
                 .HasConstraintName("FK_KhachHang_TaiKhoan");
+        });
+
+        modelBuilder.Entity<LoaiTaiKhoan>(entity =>
+        {
+            entity.HasKey(e => e.MaLoaiTk);
+
+            entity.ToTable("LoaiTaiKhoan");
+
+            entity.Property(e => e.MaLoaiTk)
+                .ValueGeneratedNever()
+                .HasColumnName("MaLoaiTK");
+            entity.Property(e => e.TenLoaiTk)
+                .HasMaxLength(100)
+                .HasColumnName("TenLoaiTK");
         });
 
         modelBuilder.Entity<NhanVien>(entity =>
@@ -210,12 +217,14 @@ public partial class DienLucContext : DbContext
                 .HasMaxLength(25)
                 .IsFixedLength()
                 .HasColumnName("MaTK");
-            entity.Property(e => e.LoaiTk)
-                .HasMaxLength(25)
-                .HasColumnName("LoaiTK");
+            entity.Property(e => e.LoaiTk).HasColumnName("LoaiTK");
             entity.Property(e => e.Mk)
                 .HasMaxLength(25)
                 .HasColumnName("MK");
+
+            entity.HasOne(d => d.LoaiTkNavigation).WithMany(p => p.TaiKhoans)
+                .HasForeignKey(d => d.LoaiTk)
+                .HasConstraintName("FK_TaiKhoan_LoaiTaiKhoan");
         });
 
         modelBuilder.Entity<ThongBao>(entity =>
@@ -231,18 +240,6 @@ public partial class DienLucContext : DbContext
             entity.HasOne(d => d.MaHdNavigation).WithMany(p => p.ThongBaos)
                 .HasForeignKey(d => d.MaHd)
                 .HasConstraintName("FK_ThongBao_HoaDon");
-        });
-
-        modelBuilder.Entity<VaiTro>(entity =>
-        {
-            entity.ToTable("VaiTro");
-
-            entity.HasIndex(e => e.ViTri, "IX_VaiTro").IsUnique();
-
-            entity.Property(e => e.Id)
-                .HasMaxLength(10)
-                .IsFixedLength();
-            entity.Property(e => e.ViTri).HasMaxLength(50);
         });
 
         OnModelCreatingPartial(modelBuilder);

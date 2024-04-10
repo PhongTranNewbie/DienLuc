@@ -23,11 +23,7 @@ public partial class KhachHang
 
     public string? MaThue { get; set; }
 
-    public string? MaVaiTro { get; set; }
-
     public virtual ICollection<DongHoDien> DongHoDiens { get; set; } = new List<DongHoDien>();
-
-    public virtual VaiTro? MaVaiTroNavigation { get; set; }
 
     public virtual TaiKhoan? MatkNavigation { get; set; }
 }
