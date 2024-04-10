@@ -23,8 +23,6 @@ public partial class DienLucContext : DbContext
 
     public virtual DbSet<KhachHang> KhachHangs { get; set; }
 
-    public virtual DbSet<LoaiTaiKhoan> LoaiTaiKhoans { get; set; }
-
     public virtual DbSet<NhanVien> NhanViens { get; set; }
 
     public virtual DbSet<TaiKhoan> TaiKhoans { get; set; }
@@ -33,7 +31,7 @@ public partial class DienLucContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=MSI\\SQLSEVER2022DEV;Database=DienLuc;trusted_connection=yes;Encrypt=True;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Data Source=LAPTOP-LDNCHQAF;Initial Catalog=DienLuc (3);Integrated Security=True;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -162,20 +160,6 @@ public partial class DienLucContext : DbContext
                 .HasConstraintName("FK_KhachHang_TaiKhoan");
         });
 
-        modelBuilder.Entity<LoaiTaiKhoan>(entity =>
-        {
-            entity.HasKey(e => e.MaLoaiTk);
-
-            entity.ToTable("LoaiTaiKhoan");
-
-            entity.Property(e => e.MaLoaiTk)
-                .ValueGeneratedNever()
-                .HasColumnName("MaLoaiTK");
-            entity.Property(e => e.TenLoaiTk)
-                .HasMaxLength(100)
-                .HasColumnName("TenLoaiTK");
-        });
-
         modelBuilder.Entity<NhanVien>(entity =>
         {
             entity.HasKey(e => e.MaNv);
@@ -221,10 +205,6 @@ public partial class DienLucContext : DbContext
             entity.Property(e => e.Mk)
                 .HasMaxLength(25)
                 .HasColumnName("MK");
-
-            entity.HasOne(d => d.LoaiTkNavigation).WithMany(p => p.TaiKhoans)
-                .HasForeignKey(d => d.LoaiTk)
-                .HasConstraintName("FK_TaiKhoan_LoaiTaiKhoan");
         });
 
         modelBuilder.Entity<ThongBao>(entity =>

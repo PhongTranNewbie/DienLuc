@@ -9,11 +9,9 @@ public partial class TaiKhoan
 
     public string? Mk { get; set; }
 
-    public int? LoaiTk { get; set; }
+    public string LoaiTk { get; set; }
 
     public virtual KhachHang? KhachHang { get; set; }
-
-    public virtual LoaiTaiKhoan? LoaiTkNavigation { get; set; }
 
     public virtual NhanVien? NhanVien { get; set; }
 }
