@@ -1,0 +1,30 @@
+﻿@model DienLuc.Models.TaiKhoan
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>TaiKhoan</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Mk)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Mk)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LoaiTk)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LoaiTk)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.MaTk">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
