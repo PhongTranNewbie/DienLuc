@@ -17,7 +17,36 @@ namespace DienLuc.Controllers
         {
             _context = context;
         }
+        [HttpGet]
+        public IActionResult Login()
+        {
+            if (HttpContext.Session.GetString("MaTk") != null || HttpContext.Session.GetString("LoaiTk") != "0")
+            {
+                // Check if there is no logged-in user or the logged-in user is not an admin
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+        }
+        [HttpPost]
+        public IActionResult Login(TaiKhoan taikhoan)
+        {
+            if (HttpContext.Session.GetString("MaTk") == null)
+            {
+                var user = _context.TaiKhoans.FirstOrDefault(x => x.MaTk.Equals(taikhoan.MaTk) && x.Mk.Equals(taikhoan.Mk) && x.LoaiTk == "0");
 
+                if (user != null)
+                {
+                    HttpContext.Session.SetString("MaTk", user.MaTk);
+                    HttpContext.Session.SetString("Role", user.LoaiTk);
+
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+            return View(taikhoan);
+        }
         // GET: TaiKhoan
         public async Task<IActionResult> Index()
         {
