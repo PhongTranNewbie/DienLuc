@@ -1,0 +1,133 @@
+﻿    @model DienLuc.Models.HoaDon
+
+    @{
+        ViewData["Title"] = "Create";
+        Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+    }
+    <div class="page-header">
+        <nav style="--cui-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Danh sách đồng hồ</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Thêm mới</li>
+            </ol>
+        </nav>
+    </div>
+
+    <hr />
+    <div class="row">
+        <h1>Thêm hóa đơn</h1>
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="MaHd" class="control-label">Mã hóa đơn</label>
+                    <input asp-for="MaHd" class="form-control" />
+                    <span asp-validation-for="MaHd" class="text-danger"></span>
+                </div>
+            
+                <div class="form-group">
+                    <label class="control-label">Mã khách hàng</label>
+                    <input id="MaKh" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Mã đồng hồ</label>
+                    <input id="MaDh" class="form-control" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="MaChiTietSddien" class="control-label">Mã chi tiết sử dụng điện</label> 
+                    <select id="MaChiTietSddien" name="MaChiTietSddien" asp-for="MaChiTietSddien" class="form-control" asp-items="ViewBag.MaChiTietSddien"></select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="NgayTao" class="control-label">Ngày tạo</label>
+                    <input asp-for="NgayTao" class="form-control" />
+                    <span asp-validation-for="NgayTao" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ChiSoCu" class="control-label">Chỉ số cũ</label>
+                    <input asp-for="ChiSoCu" class="form-control" readonly />
+                    <span asp-validation-for="ChiSoCu" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ChiSoMoi" class="control-label">Chỉ số mới</label>
+                    <input asp-for="ChiSoMoi" class="form-control" />
+                    <span asp-validation-for="ChiSoMoi" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ChiSoTieuThu" class="control-label">Chỉ số tiêu thụ</label>
+                    <input asp-for="ChiSoTieuThu" class="form-control" />
+                    <span asp-validation-for="ChiSoTieuThu" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="NgayDenHan" class="control-label">Ngày đến hạn</label>
+                    <input asp-for="NgayDenHan" class="form-control" />
+                    <span asp-validation-for="NgayDenHan" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="TrangThai" class="control-label"></label>
+                    <select asp-for="TrangThai" class="form-control">
+                        <option value="Chưa thanh toán">Chưa thanh toán</option>
+                        <option value="Đã thanh toán">Đã thanh toán</option>
+                        <option value="Còn nợ">Còn nợ</option>
+                        <option value="Đã chuyển vào hóa đơn tiếp theo">Đã chuyển vào hóa đơn tiếp theo</option>
+                    </select>
+                    <span asp-validation-for="TrangThai" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script>
+            $(document).ready(function () {
+                // Gán sự kiện thay đổi cho ô input NgayTao
+                $('#MaChiTietSddien').change(function () {
+                    var maChiTietSddien = $('#MaChiTietSddien').val();  // Sử dụng id của dropdown list
+
+                    // Gửi yêu cầu AJAX để lấy dữ liệu từ máy chủ (ChiSoThangTruoc)
+                    $.ajax({
+                    url: '/admin/Hoadon/GetChiSoThangTruoc/' + maChiTietSddien,
+                    type: 'GET',
+                    success: function (data) {
+                            // Cập nhật các ô chỉ số trên giao diện
+                            $('#ChiSoCu').val(data.chiSoCu);
+                            $('#ChiSoMoi').val(data.chiSoMoi);
+                            $('#ChiSoTieuThu').val(data.chiSoTieuThu);
+                        },
+                        error: function () {
+                            console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
+                        }
+                    });
+
+                    // Gửi yêu cầu AJAX để lấy mã đồng hồ và mã khách hàng từ máy chủ (GetMeterAndCustomerCode)
+                    $.ajax({
+                        url: '/admin/Hoadon/GetMeterAndCustomerCode/' + maChiTietSddien, // Sửa URL
+                        type: 'GET',
+                        success: function (data) {
+                            $('#MaKh').val(data.maKh);
+                            $('#MaDh').val(data.maDh);
+                        },
+                        error: function () {
+                            console.log('An error occurred while fetching meter code and customer code.');
+                        }
+                    });
+                });
+            });
+        </script>
+
+
+
+
+
+    }

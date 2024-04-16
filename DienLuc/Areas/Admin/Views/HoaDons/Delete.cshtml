@@ -1,0 +1,95 @@
+﻿@model DienLuc.Models.HoaDon
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+
+<div class="page-header">
+    <nav style="--cui-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Danh sách đồng hồ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Xóa</li>
+        </ol>
+    </nav>
+</div>
+<hr />
+<div>
+    <h4>Bạn có chắc chắn muốn xóa hóa đơn này hay không?</h4>
+
+    <dl class="row">
+        <div class="col-sm-auto">
+            <label for="NgayTao" class="col-form-label">Ngày tạo</label>
+            <input type="text" id="NgayTao" class="form-control" value="@Html.DisplayFor(model => model.NgayTao)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="NgayDenHan" class="col-form-label">Ngày đến hạn</label>
+            <input type="text" id="NgayDenHan" class="form-control" value="@Html.DisplayFor(model => model.NgayDenHan)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="NgayThanhToan" class="col-form-label">Ngày thanh toán</label>
+            <input type="text" id="NgayThanhToan" class="form-control" value="@Html.DisplayFor(model => model.NgayThanhToan)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="ChiSoCu" class="col-form-label">Chỉ số cũ</label>
+            <input type="text" id="ChiSoCu" class="form-control" value="@Html.DisplayFor(model => model.ChiSoCu)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="ChiSoMoi" class="col-form-label">Chỉ số mới</label>
+            <input type="text" id="ChiSoMoi" class="form-control" value="@Html.DisplayFor(model => model.ChiSoMoi)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="ChiSoTieuThu" class="col-form-label">Chỉ số tiêu thụ</label>
+            <input type="text" id="ChiSoTieuThu" class="form-control" value="@Html.DisplayFor(model => model.ChiSoTieuThu)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="Thue" class="col-form-label">Thuế</label>
+            <input type="text" id="Thue" class="form-control" value="@Html.DisplayFor(model => model.Thue)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="SoNo" class="col-form-label">Số nợ</label>
+            <input type="text" id="SoNo" class="form-control" value="@Html.DisplayFor(model => model.SoNo)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="SoTienCanThanhToan" class="col-form-label">Số tiền cần thanh toán</label>
+            <input type="text" id="SoTienCanThanhToan" class="form-control" value="@Html.DisplayFor(model => model.SoTienCanThanhToan)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="SoTienDaThanhToan" class="col-form-label">Số tiền đã thanh toán</label>
+            <input type="text" id="SoTienDaThanhToan" class="form-control" value="@Html.DisplayFor(model => model.SoTienDaThanhToan)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="HinhThucThanhToan" class="col-form-label">Hình thức thanh toán</label>
+            <input type="text" id="HinhThucThanhToan" class="form-control" value="@Html.DisplayFor(model => model.HinhThucThanhToan)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="TrangThai" class="col-form-label">Trạng thái</label>
+            <input type="text" id="TrangThai" class="form-control" value="@Html.DisplayFor(model => model.TrangThai)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="MaChiTietSddienNavigation" class="col-form-label">Mã chi tiết sử dụng điện</label>
+            <input type="text" id="MaChiTietSddienNavigation" class="form-control" value="@Html.DisplayFor(model => model.MaChiTietSddienNavigation.MaDh)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="MaNvNavigation" class="col-form-label">Mã nhân viên</label>
+            <input type="text" id="MaNvNavigation" class="form-control" value="@Html.DisplayFor(model => model.MaNvNavigation.MaNv)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="MaChiTietSddienNavigation" class="col-form-label">Mã đồng hồ</label>
+            <input type="text" id="MaChiTietSddienNavigation" class="form-control" value="@Html.DisplayFor(model => model.MaChiTietSddienNavigation.MaDh)" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label  class="col-form-label">Mã khách hàng</label>
+            <input type="text"  class="form-control" value="@Model.MaChiTietSddienNavigation.MaDhNavigation.MaKh" readonly>
+        </div>
+
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="MaHd" />
+        <input type="submit" value="Xóa" class="btn btn-danger" />
+
+    </form>
+</div>

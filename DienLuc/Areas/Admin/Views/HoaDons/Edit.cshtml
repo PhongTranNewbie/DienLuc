@@ -1,0 +1,126 @@
+﻿@model DienLuc.Models.HoaDon
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+
+}
+<div class="page-header">
+    <nav style="--cui-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Danh sách đồng hồ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+        </ol>
+    </nav>
+</div>
+
+<hr />
+<div class="row">
+    <h4>Chỉnh sửa hóa đơn</h4>
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="MaHd" />
+            <div class="form-group">
+                <label asp-for="MaNv" class="control-label">Mã nhân viên</label>
+                <input asp-for="MaNv" class="form-control" readonly />
+                <span asp-validation-for="MaNv" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label  class="control-label">Mã khách hàng</label>
+                <input  class="form-control" readonly value="@ViewData["MaKh"]" />
+                <span  class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MaChiTietSddien" class="control-label">Mã chi tiết sử dụng điện</label>
+                <input asp-for="MaChiTietSddien" class="form-control" readonly />
+                <span asp-validation-for="MaChiTietSddien" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Mã đồng hồ</label>
+                <input class="form-control" value="@Html.DisplayFor(model => model.MaChiTietSddienNavigation.MaDh)" readonly />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ChiSoCu" class="control-label">Chỉ số cũ</label>
+                <input asp-for="ChiSoCu" class="form-control" readonly />
+                <span asp-validation-for="ChiSoCu" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChiSoMoi" class="control-label">Chỉ số mới</label>
+                <input asp-for="ChiSoMoi" class="form-control" readonly />
+                <span asp-validation-for="ChiSoMoi" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChiSoTieuThu" class="control-label">Chỉ số tiêu thụ</label>
+                <input asp-for="ChiSoTieuThu" class="form-control" readonly />
+                <span asp-validation-for="ChiSoTieuThu" class="text-danger"></span>
+            </div>
+
+            <!-- Các trường khác có thể chỉnh sửa -->
+
+            <div class="form-group">
+                <label asp-for="NgayTao" class="control-label">Ngày tạo</label>
+                <input asp-for="NgayTao" class="form-control" readonly/>
+                <span asp-validation-for="NgayTao" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NgayDenHan" class="control-label">Ngày đến hạn</label>
+                <input asp-for="NgayDenHan" class="form-control" />
+                <span asp-validation-for="NgayDenHan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NgayThanhToan" class="control-label">Ngày thanh toán</label>
+                <input asp-for="NgayThanhToan" class="form-control" readonly />
+                <span asp-validation-for="NgayThanhToan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Thue" class="control-label">Thuế</label>
+                <input asp-for="Thue" class="form-control" readonly />
+                <span asp-validation-for="Thue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SoNo" class="control-label">Số nợ</label>
+                <input asp-for="SoNo" class="form-control" type="number" readonly />
+                <span asp-validation-for="SoNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SoTienCanThanhToan" class="control-label">Số tiền cần thanh toán</label>
+                <input asp-for="SoTienCanThanhToan" class="form-control" type="number" readonly />
+                <span asp-validation-for="SoTienCanThanhToan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SoTienDaThanhToan" class="control-label">Số tiền đã thanh toán</label>
+                <input asp-for="SoTienDaThanhToan" class="form-control" type="number" />
+                <span asp-validation-for="SoTienDaThanhToan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HinhThucThanhToan" class="control-label">Hình thức thanh toán</label>
+                <select asp-for="HinhThucThanhToan" class="form-control">
+                    <option value="Trực tiếp">Trực tiếp</option>
+                    <option value="Trực tuyến">Trực tuyến</option>
+                </select>
+                <span asp-validation-for="HinhThucThanhToan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TrangThai" class="control-label">Trạng thái</label>
+                <select asp-for="TrangThai" class="form-control">
+                    <option value="Chưa thành toán">Chưa thanh toán</option>
+                    <option value="Đã thanh toán">Đã thanh toán</option>
+                    <option value="Còn nợ">Còn nợ</option>
+                    <option value="Đã chuyển vào hóa đơn tiếp theo">Đã chuyển vào hóa đơn tiếp theo</option>
+                </select>
+                <span asp-validation-for="TrangThai" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Lưu" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

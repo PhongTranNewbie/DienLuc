@@ -1,0 +1,56 @@
+﻿@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<DongHoDien>
+@{
+    Layout = "~/Areas/KhachHang/Views/Shared/_LayoutKH.cshtml";
+}
+<h2>Danh sách các đồng hồ</h2>
+<table class="table">
+    <thead>
+        <tr class="table-warning">
+            <th>
+                Mã đồng hồ
+            </th>
+            <th>
+                Mã khách hàng
+            </th>
+            <th>
+                Trạng thái
+            </th>
+            <th>
+                Ngày cập nhật trạng thái
+            </th>
+            <th>
+                Loại đồng hồ
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    @{
+            int i = 0;
+            string @cls = "table-success";
+    }
+    @foreach(var item in Model)
+    {
+        i = i + 1;
+        cls = "table-success";
+        if(i % 2 == 0)
+        {
+            cls = "table-primary";
+        }
+        <tr class="@cls">
+            <td>@item.MaDh</td>
+            <td>@item.MaKh</td>
+            <td>@item.TrangThai</td>
+            <td>@item.NgayCapNhatTrangThai</td>
+            <td>@item.LoaiDhd</td>
+            <td>
+                
+            </td>
+        </tr>
+    }
+</table>
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+   {
+       LiElementClasses = new string[] { "page-item" },
+       PageClasses = new string[] { "page-link" }
+   })

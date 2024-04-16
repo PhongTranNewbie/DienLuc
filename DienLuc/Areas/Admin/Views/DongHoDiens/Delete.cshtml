@@ -1,0 +1,57 @@
+﻿@model DienLuc.Models.DongHoDien
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="page-header">
+    <nav style="--cui-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Danh sách đồng hồ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
+        </ol>
+    </nav>
+</div>
+<div>
+    <h3>Bạn có chắc chắn là muốn xóa hay không?</h3>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Mã đồng hồ
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MaDh)
+        </dd>
+        
+        <dt class="col-sm-2">
+            Mã khách hàng
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MaKh)
+        </dd>
+        <dt class="col-sm-2">
+            Trạng thái
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TrangThai)
+        </dd>
+        <dt class="col-sm-2">
+            Ngày cập nhật trạng thái
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NgayCapNhatTrangThai)
+        </dd>
+        <dt class="col-sm-2">
+            Loại đồng hồ
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LoaiDhd)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="MaDh" />
+        <input type="submit" value="Xóa" class="btn btn-danger" />
+
+    </form>
+</div>

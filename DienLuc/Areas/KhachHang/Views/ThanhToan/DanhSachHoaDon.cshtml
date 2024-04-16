@@ -1,0 +1,46 @@
+﻿@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<HoaDon>
+@{
+    Layout = "~/Areas/KhachHang/Views/Shared/_LayoutKH.cshtml";
+}
+<h2>Danh sách hóa đơn</h2>
+
+<table class="table">
+    <thead>
+        <tr class="table-warning">
+            <th>Mã hóa đơn</th>
+            <th>Số tiền cần thanh toán</th>
+            <th>Số tiền đã thanh toán</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 0;
+            string @cls = "table-success";
+        }
+        @foreach (var hoaDon in Model)
+        {
+            i = i + 1;
+            cls = "table-success";
+            if (i % 2 == 0)
+            {
+                cls = "table-primary";
+            }
+            <tr class="@cls">
+                <td>@hoaDon.MaHd</td>
+                <td>@hoaDon.SoTienCanThanhToan</td>
+                <td>@hoaDon.SoTienDaThanhToan</td>
+                <td>
+                    <a asp-controller="ThanhToan" asp-action="ThanhToan" asp-route-maHd="@hoaDon.MaHd" class="btn btn-primary">Thanh toán</a>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+{
+    LiElementClasses = new string[] { "page-item" },
+    PageClasses = new string[] { "page-link" }
+})

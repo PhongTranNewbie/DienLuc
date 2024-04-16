@@ -9,6 +9,9 @@ using DienLuc.Models;
 
 namespace DienLuc.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+    [Route("admin")]
+    [Route("admin/taikhoan")]
     public class TaiKhoansController : Controller
     {
         private readonly DienLucContext _context;
@@ -43,6 +46,7 @@ namespace DienLuc.Areas.Admin.Controllers
         }
 
         // GET: TaiKhoans/Create
+        [HttpGet("TaoTaiKhoanNV")]
         public IActionResult Create()
         {
             return View();
@@ -51,7 +55,7 @@ namespace DienLuc.Areas.Admin.Controllers
         // POST: TaiKhoans/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost("TaoTaiKhoanNV")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MaTk,Mk,LoaiTk")] TaiKhoan taiKhoan)
         {
@@ -65,6 +69,7 @@ namespace DienLuc.Areas.Admin.Controllers
         }
 
         // GET: TaiKhoans/Edit/5
+        [HttpGet("CapNhatTT/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -83,7 +88,7 @@ namespace DienLuc.Areas.Admin.Controllers
         // POST: TaiKhoans/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost("CapNhatThongTin/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("MaTk,Mk,LoaiTk")] TaiKhoan taiKhoan)
         {
@@ -116,6 +121,7 @@ namespace DienLuc.Areas.Admin.Controllers
         }
 
         // GET: TaiKhoans/Delete/5
+        [HttpGet("XoaTaiKhoan/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -134,7 +140,7 @@ namespace DienLuc.Areas.Admin.Controllers
         }
 
         // POST: TaiKhoans/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost("XoaTaiKhoan/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {

@@ -1,0 +1,73 @@
+﻿@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<ChiTietSddien>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>Danh mục cho chi tiết sử dụng điện</h1>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Tạo mới</a>
+</p>
+<table class="table">
+    <thead>
+        <tr class="table-warning">
+            <th>
+                Id
+            </th>
+           
+            <th>
+                Mã đồng hồ
+            </th>
+            <th>
+                Mã nhân viên
+            </th>
+            <th>
+                Chỉ số điện
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 0;
+            string @cls = "table-success";
+        }
+        @foreach (var item in Model)
+        {
+            i = i + 1;
+            cls = "table-success";
+            if (i % 2 == 0)
+            {
+                cls = "table-primary";
+            }
+            <tr class="@cls">
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+           
+            <td>
+                @Html.DisplayFor(modelItem => item.MaDhNavigation.MaDh)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaNvNavigation.MaNv)
+            </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ChiSoDien)
+                </td>
+            <td>
+                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id">Chỉnh sửa</a> |
+                    <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id">Xem chi tiết</a> |
+                    <a class="btn btn-primary" asp-action="Delete" asp-route-id="@item.Id">Xóa</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+{
+    LiElementClasses = new string[] { "page-item" },
+    PageClasses = new string[] { "page-link" }
+})
