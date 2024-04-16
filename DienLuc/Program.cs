@@ -44,6 +44,11 @@ app.MapAreaControllerRoute(
     pattern: "Admin/{controller=AccountAdmin}/{action=Login}/{id?}");
 
 app.MapAreaControllerRoute(
+    name: "Employee",
+    areaName: "NhanVien",
+    pattern: "Employee/{controller=AccountEmployee}/{action=Login1}/{id?}");
+
+app.MapAreaControllerRoute(
     name: "Admin_Create",
     areaName: "Admin",
     pattern: "Admin/Create",
@@ -52,6 +57,8 @@ app.MapAreaControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=TaiKhoan}/{action=Create}/{id?}");
+    pattern: "{controller}/{action}/{id?}",
+    defaults: new { controller = "TaiKhoan", action = "Create" }); // Update default route
+
 
 app.Run();

@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace Dienluc.Areas.Admin.Controllers
 {
-    public class AccountAdminController : Controller
+    public class AccountEmployeeController : Controller
     {
         private readonly DienLucContext _db;
 
-        public AccountAdminController(DienLucContext db)
+        public AccountEmployeeController(DienLucContext db)
         {
             _db = db;
         }
