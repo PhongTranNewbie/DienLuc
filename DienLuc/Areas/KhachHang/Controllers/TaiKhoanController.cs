@@ -102,6 +102,7 @@ namespace DienLuc.Areas.KhachHang.Controllers
                     DiaChi = viewModel.DiaChi,
                     SoDt = viewModel.SoDt,
                     MaThue = viewModel.MaThue,
+                    Email = viewModel.Email
                 };
 
                 // Thêm khách hàng mới vào context và lưu vào cơ sở dữ liệu
