@@ -88,7 +88,20 @@ namespace DienLuc.Areas.KhachHang.Controllers
 
                 // Tạo mã khách hàng mới
                 var maxMaKh = await _context.KhachHangs.MaxAsync(kh => kh.MaKh);
-                var newMaKh = "KH" + (int.Parse(maxMaKh.Replace("KH", "")) + 1);
+                string newMaKh;
+
+                // Kiểm tra xem maxMaKh có giá trị null không
+                if (maxMaKh == null)
+                {
+                    // Nếu maxMaKh là null, gán mã khách hàng đầu tiên là "KH1"
+                    newMaKh = "KH1";
+                }
+                else
+                {
+                    // Nếu maxMaKh không phải null, tăng mã khách hàng lên một đơn vị và sử dụng nó cho mã khách hàng mới
+                    int nextMaKhNumber = int.Parse(maxMaKh.Replace("KH", "")) + 1;
+                    newMaKh = "KH" + nextMaKhNumber;
+                }
 
                 // Tạo đối tượng KhachHang mới
                 var newKhachHang = new Models.KhachHang
@@ -104,6 +117,7 @@ namespace DienLuc.Areas.KhachHang.Controllers
                     MaThue = viewModel.MaThue,
                     Email = viewModel.Email
                 };
+                
 
                 // Thêm khách hàng mới vào context và lưu vào cơ sở dữ liệu
                 _context.KhachHangs.Add(newKhachHang);
