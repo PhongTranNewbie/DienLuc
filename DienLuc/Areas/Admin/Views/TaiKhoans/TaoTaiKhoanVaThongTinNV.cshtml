@@ -1,0 +1,75 @@
+﻿@model DienLuc.ViewModels.TaiKhoanVaThongTinNVViewModel
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Tạo tài khoản và thông tin nhân viên</title>
+</head>
+<body>
+    <h2>Tạo tài khoản và thông tin nhân viên</h2>
+    <form asp-action="TaoTaiKhoanVaThongTinNV" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        
+        <div class="form-group">
+            <label for="MaTk">Mã tài khoản:</label>
+            <input type="text" id="MaTk" name="MaTk" class="form-control"  required>
+            <span asp-validation-for="MaTk" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="Mk">Mật khẩu:</label>
+            <input type="password" id="Mk" name="Mk" class="form-control"  required>
+            <span asp-validation-for="Mk" class="text-danger"></span>
+        </div>
+
+
+        <!-- Thêm các trường thông tin nhân viên -->
+        <div class="form-group">
+            <label for="Cccd">CCCD:</label>
+            <input type="text" id="Cccd" name="Cccd" class="form-control"  required>
+            <span asp-validation-for="Cccd" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="Ho">Họ:</label>
+            <input type="text" id="Ho" name="Ho" class="form-control"  required>
+            <span asp-validation-for="Ho" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="Ten">Tên:</label>
+            <input type="text" id="Ten" name="Ten" class="form-control"  required>
+            <span asp-validation-for="Ten" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="NgaySinh">Ngày sinh:</label>
+            <input type="date" id="NgaySinh" name="NgaySinh" class="form-control"  required>
+            <span asp-validation-for="NgaySinh" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="DiaChi">Địa chỉ:</label>
+            <input type="text" id="DiaChi" name="DiaChi" class="form-control"  required>
+            <span asp-validation-for="DiaChi" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="SoDt">Số điện thoại:</label>
+            <input type="text" id="SoDt" name="SoDt" class="form-control"  required>
+            <span asp-validation-for="SoDt" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="Email">Email:</label>
+            <input type="text" id="SoDt" name="Email" class="form-control" required>
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label for="VaiTro">Vai trò:</label>
+            <select type="text" id="VaiTro" name="VaiTro" class="form-control" asp-items="ViewBag.VaiTro" required></select>
+            <span asp-validation-for="VaiTro" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Tạo tài khoản và nhân viên</button>
+    </form>
+</body>
+</html>

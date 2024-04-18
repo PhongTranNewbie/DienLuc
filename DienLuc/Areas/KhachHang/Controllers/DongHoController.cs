@@ -17,12 +17,18 @@ namespace DienLuc.Areas.KhachHang.Controllers
             _context = context;
         }
         [Route("")]
-        [Route("index")]
+        [Route("danhsachdongho")]
         public IActionResult Index(int? page)
         {
+            var userid = HttpContext.Session.GetString("MaTk");
+            var a = _context.KhachHangs.FirstOrDefault(x => x.Matk == userid);
+            if (userid == null)
+            {
+                return RedirectToAction("Login");
+            }
             int pageSize = 12;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
-            var dH = _context.DongHoDiens.AsNoTracking().OrderBy(x => x.MaDh);
+            var dH = _context.DongHoDiens.Where(x => x.MaKh == a.MaKh).AsNoTracking().OrderBy(x => x.MaDh);
             PagedList<DongHoDien> dhd = new PagedList<DongHoDien>(dH, pageNumber, pageSize);
             ViewBag.DongHo = dH;
             return View(dhd);

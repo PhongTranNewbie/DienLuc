@@ -87,6 +87,15 @@ namespace DienLuc.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,MaDh,NgayLayThongTin,MaNv,ChiSoDien")] ChiTietSddien chiTietSddien)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "AccountEmployee"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
+
+
             var maxChiTiet = _context.ChiTietSddiens
         .Where(c => c.MaDh == chiTietSddien.MaDh)
         .OrderByDescending(c => c.NgayLayThongTin)
@@ -116,6 +125,8 @@ namespace DienLuc.Areas.Admin.Controllers
                 // Trả về view với model để hiển thị thông báo lỗi cho người dùng
                 return View(chiTietSddien);
             }
+            var n = _context.NhanViens.FirstOrDefault(x => x.Matk == userId);
+            chiTietSddien.MaNv = n.MaNv;
             _context.Add(chiTietSddien);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

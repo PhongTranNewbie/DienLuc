@@ -7,11 +7,13 @@ public partial class ThongBao
 {
     public int Id { get; set; }
 
-    public string? MaHd { get; set; }
+    public string MaHd { get; set; } = null!;
 
-    public DateOnly? NgayThongBao { get; set; }
+    public DateOnly NgayThongBao { get; set; }
 
     public string? NoiDung { get; set; }
 
-    public virtual HoaDon? MaHdNavigation { get; set; }
+    public DateOnly NgayHetHan { get; set; }
+
+    public virtual HoaDon MaHdNavigation { get; set; } = null!;
 }

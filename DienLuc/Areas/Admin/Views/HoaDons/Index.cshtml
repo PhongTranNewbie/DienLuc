@@ -32,9 +32,7 @@
             <th>
                 Chỉ số mới
             </th>
-            <th>
-                Chỉ số tiêu thụ
-            </th>
+
             <th>
                 Số tiền cần thanh toán
             </th>
@@ -77,10 +75,10 @@
                     @Html.DisplayFor(modelItem => item.ChiSoCu)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ChiSoMoi)
+                    @Html.DisplayFor(modelItem => item.ChiSoCu)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ChiSoTieuThu)
+                    @Html.DisplayFor(modelItem => item.ChiSoMoi)
                 </td>
                 <td>
                     @string.Format("{0:N0}", item.SoTienCanThanhToan)

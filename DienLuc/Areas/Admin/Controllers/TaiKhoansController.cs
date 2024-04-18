@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DienLuc.Models;
+using DienLuc.ViewModels;
 
 namespace DienLuc.Areas.Admin.Controllers
 {
@@ -27,136 +28,170 @@ namespace DienLuc.Areas.Admin.Controllers
             return View(await _context.TaiKhoans.ToListAsync());
         }
 
-        // GET: TaiKhoans/Details/5
-        public async Task<IActionResult> Details(string id)
+
+
+        [HttpGet("TaoTaiKhoanVaThongTinNV")]
+        public IActionResult TaoTaiKhoanVaThongTinNV()
         {
-            if (id == null)
+            var user = HttpContext.Session.GetString("MaTk");
+
+            if (user == null)
             {
-                return NotFound();
+                return RedirectToAction("Login");
             }
-
-            var taiKhoan = await _context.TaiKhoans
-                .FirstOrDefaultAsync(m => m.MaTk == id);
-            if (taiKhoan == null)
-            {
-                return NotFound();
-            }
-
-            return View(taiKhoan);
-        }
-
-        // GET: TaiKhoans/Create
-        [HttpGet("TaoTaiKhoanNV")]
-        public IActionResult Create()
-        {
+            ViewData["VaiTro"] = new SelectList(_context.VaiTros, "MaVaiTro", "ViTri");
             return View();
         }
 
-        // POST: TaiKhoans/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost("TaoTaiKhoanNV")]
+        [HttpPost("TaoTaiKhoanVaThongTinNV")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaTk,Mk,LoaiTk")] TaiKhoan taiKhoan)
+        public async Task<IActionResult> TaoTaiKhoanVaThongTinNV(TaiKhoanVaThongTinNVViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(taiKhoan);
+                // Kiểm tra trùng lặp Số Điện Thoại
+                var existingPhone = await _context.NhanViens.FirstOrDefaultAsync(x => x.SoDt == viewModel.SoDt);
+                if (existingPhone != null)
+                {
+                    ModelState.AddModelError(string.Empty, "Số điện thoại đã được sử dụng cho một nhân viên khác.");
+                    return View(viewModel);
+                }
+
+                // Kiểm tra trùng lặp Email
+                var existingEmail = await _context.NhanViens.FirstOrDefaultAsync(x => x.Email == viewModel.Email);
+                if (existingEmail != null)
+                {
+                    ModelState.AddModelError(string.Empty, "Email đã được sử dụng cho một nhân viên khác.");
+                    return View(viewModel);
+                }
+
+                // Kiểm tra trùng lặp Mã Nhân Viên
+                var existingMaNv = await _context.NhanViens.FirstOrDefaultAsync(x => x.MaNv == viewModel.MaNv);
+                if (existingMaNv != null)
+                {
+                    ModelState.AddModelError(string.Empty, "Mã nhân viên đã tồn tại.");
+                    return View(viewModel);
+                }
+
+                // Kiểm tra trùng lặp CCCD
+                var existingCCCD = await _context.NhanViens.FirstOrDefaultAsync(x => x.Cccd == viewModel.Cccd);
+                if (existingCCCD != null)
+                {
+                    ModelState.AddModelError(string.Empty, "CCCD đã được sử dụng cho một nhân viên khác.");
+                    return View(viewModel);
+                }
+
+                // Tạo tài khoản
+                var taiKhoan = new TaiKhoan
+                {
+                    MaTk = viewModel.MaTk,
+                    Mk = viewModel.Mk,
+                    LoaiTk = "TK2" // Loại tài khoản nhân viên
+                };
+
+                _context.TaiKhoans.Add(taiKhoan);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // Tạo mã khách hàng mới
+                var maxMaNv = await _context.NhanViens.MaxAsync(kh => kh.MaNv);
+                var newMaNv = "NV" + (int.Parse(maxMaNv.Replace("NV", "")) + 1);
+                // Tạo đối tượng Nhân viên mới
+                var newNhanVien = new NhanVien
+                {
+                    MaNv = newMaNv,
+                    Matk = viewModel.MaTk,
+                    Cccd = viewModel.Cccd,
+                    Ho = viewModel.Ho,
+                    Ten = viewModel.Ten,
+                    NgaySinh = viewModel.NgaySinh,
+                    DiaChi = viewModel.DiaChi,
+                    SoDt = viewModel.SoDt,
+                    Email = viewModel.Email,
+                    VaiTro = viewModel.VaiTro
+                };
+
+                // Thêm nhân viên mới vào context và lưu vào cơ sở dữ liệu
+                _context.NhanViens.Add(newNhanVien);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Index", "DongHoDiens");
             }
-            return View(taiKhoan);
+
+            return View(viewModel);
         }
 
-        // GET: TaiKhoans/Edit/5
-        [HttpGet("CapNhatTT/{id}")]
-        public async Task<IActionResult> Edit(string id)
+
+        // GET: NhanVien/Details/5
+        [HttpGet("ThongTinNV")]
+        public async Task<IActionResult> ThongTinNV()
         {
-            if (id == null)
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
             {
                 return NotFound();
             }
 
-            var taiKhoan = await _context.TaiKhoans.FindAsync(id);
-            if (taiKhoan == null)
+            var nhanVien = await _context.NhanViens
+                .FirstOrDefaultAsync(m => m.Matk == userId);
+            if (nhanVien == null)
             {
                 return NotFound();
             }
-            return View(taiKhoan);
+
+            return View(nhanVien);
+        }
+        [HttpGet("ChinhSuaThongTin")]
+        public async Task<IActionResult> ChinhSuaThongTin()
+        {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                return NotFound();
+            }
+
+            var nhanVien = await _context.NhanViens.FirstOrDefaultAsync(m => m.Matk == userId);
+            if (nhanVien == null)
+            {
+                return NotFound();
+            }
+
+            return View(nhanVien);
         }
 
-        // POST: TaiKhoans/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost("CapNhatThongTin/{id}")]
+        [HttpPost("ChinhSuaThongTin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("MaTk,Mk,LoaiTk")] TaiKhoan taiKhoan)
+        public async Task<IActionResult> ChinhSuaThongTin(NhanVien model)
         {
-            if (id != taiKhoan.MaTk)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
+                var userId = HttpContext.Session.GetString("MaTk");
+                if (userId != null)
                 {
-                    _context.Update(taiKhoan);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TaiKhoanExists(taiKhoan.MaTk))
+                    var nhanVien = await _context.NhanViens.FirstOrDefaultAsync(m => m.Matk == userId);
+                    if (nhanVien != null)
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        // Cập nhật thông tin từ model vào đối tượng nhân viên
+                        nhanVien.Cccd = model.Cccd;
+                        nhanVien.Ho = model.Ho;
+                        nhanVien.Ten = model.Ten;
+                        nhanVien.NgaySinh = model.NgaySinh;
+                        nhanVien.DiaChi = model.DiaChi;
+                        nhanVien.SoDt = model.SoDt;
+
+                        // Lưu thay đổi vào cơ sở dữ liệu
+                        _context.NhanViens.Update(nhanVien);
+                        await _context.SaveChangesAsync();
+
+                        return RedirectToAction("ThongTinNV");
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(taiKhoan);
-        }
-
-        // GET: TaiKhoans/Delete/5
-        [HttpGet("XoaTaiKhoan/{id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
             }
 
-            var taiKhoan = await _context.TaiKhoans
-                .FirstOrDefaultAsync(m => m.MaTk == id);
-            if (taiKhoan == null)
-            {
-                return NotFound();
-            }
-
-            return View(taiKhoan);
+            // Nếu ModelState không hợp lệ, quay lại view chỉnh sửa với dữ liệu hiện tại
+            return View(model);
         }
 
-        // POST: TaiKhoans/Delete/5
-        [HttpPost("XoaTaiKhoan/{id}")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            var taiKhoan = await _context.TaiKhoans.FindAsync(id);
-            if (taiKhoan != null)
-            {
-                _context.TaiKhoans.Remove(taiKhoan);
-            }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool TaiKhoanExists(string id)
-        {
-            return _context.TaiKhoans.Any(e => e.MaTk == id);
-        }
     }
 }

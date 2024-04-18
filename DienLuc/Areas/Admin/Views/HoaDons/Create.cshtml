@@ -54,11 +54,7 @@
                     <input asp-for="ChiSoMoi" class="form-control" />
                     <span asp-validation-for="ChiSoMoi" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="ChiSoTieuThu" class="control-label">Chỉ số tiêu thụ</label>
-                    <input asp-for="ChiSoTieuThu" class="form-control" />
-                    <span asp-validation-for="ChiSoTieuThu" class="text-danger"></span>
-                </div>
+
                 <div class="form-group">
                     <label asp-for="NgayDenHan" class="control-label">Ngày đến hạn</label>
                     <input asp-for="NgayDenHan" class="form-control" />
@@ -82,9 +78,6 @@
         </div>
     </div>
 
-    <div>
-        <a asp-action="Index">Back to List</a>
-    </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     @section Scripts {

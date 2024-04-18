@@ -1,11 +1,4 @@
-﻿@using DienLuc.Models;
-@{
-    Layout = null;
-}
-
-@model TaiKhoan;
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Required meta tags -->
@@ -30,31 +23,15 @@
         <div class="container-fluid page-body-wrapper full-page-wrapper">
             <div class="content-wrapper d-flex align-items-center auth">
                 <div class="row flex-grow">
-                    <div class="col-lg-4 mx-auto">
+                    <div class="col-lg-6 mx-auto">
                         <div class="auth-form-light text-left p-5">
                             <div class="brand-logo">
                                 <a class="navbar-brand logo_h"><img src="~/karma-master/img/logo.png" alt=""></a>
                             </div>
-                            <h4>Hello! let's get started</h4>
-                            <h6 class="font-weight-light">Sign in to continue.</h6>
-                            @*<form class="pt-3> *@
-                            @using (Html.BeginForm("Login", "AccountAdmin", FormMethod.Post))
-                            {
-                                <div class="form-group">
-                                    @Html.TextBoxFor(x => x.MaTk, new { @class = "form-control form-control-lg", placeholder = "MaTk", required = "required", autofocus = "autofocus" })
-                                    @*                                     <input type="email" class="form-control form-control-lg" id="exampleInputEmail1" placeholder="Username">
-                                *@
-                                </div>
-                                <div class="form-group">
-                                    @Html.TextBoxFor(x => x.Mk, new { @class = "form-control form-control-lg", placeholder = "Matkhau", type = "password" })
+                            @RenderBody()
+                            @RenderSection("content", required: false)
 
-                                    @*                                     <input type="password" class="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password">
-                                *@
-                                </div>
-                                <div class="mt-3">
-                                    <button class="btn btn-block btn-lg font-weight-medium auth-form-btn custom-btn" type="submit">LOG IN</button>
-                                </div>
-                            } @* </form> *@
+                            @RenderSection("Scripts", required: false)
                         </div>
                     </div>
                 </div>

@@ -101,6 +101,7 @@ namespace DienLuc.Areas.Admin.Controllers
                 .Include(h => h.MaChiTietSddienNavigation)
                 .Include(h => h.MaChiTietSddienNavigation.MaDhNavigation)
                 .Include(h => h.MaNvNavigation)
+                .Include(h => h.MaPtttoanNavigation)
                 .FirstOrDefaultAsync(m => m.MaHd == id);
             if (hoaDon == null)
             {
@@ -132,36 +133,36 @@ namespace DienLuc.Areas.Admin.Controllers
         {
             decimal soTien = 0;
             // Chuyển % thuế thành số thập phân
-
+            var chisotieuthu = hoaDon.ChiSoMoi - hoaDon.ChiSoCu;
             // Tính tiền theo bậc
-            if (hoaDon.ChiSoTieuThu <= 50)
+            if (chisotieuthu <= 50)
             {
-                soTien = (decimal)(hoaDon.ChiSoTieuThu * 1678); // Bậc 1: 0 - 50 kWh
+                soTien = (decimal)(chisotieuthu * 1678); // Bậc 1: 0 - 50 kWh
             }
-            else if (hoaDon.ChiSoTieuThu <= 100)
+            else if (chisotieuthu <= 100)
             {
-                soTien = (decimal)(50 * 1678 + (hoaDon.ChiSoTieuThu - 50) * 1734); // Bậc 2: 50 - 100 kWh
+                soTien = (decimal)(50 * 1678 + (chisotieuthu - 50) * 1734); // Bậc 2: 50 - 100 kWh
             }
-            else if (hoaDon.ChiSoTieuThu <= 200)
+            else if (chisotieuthu <= 200)
             {
-                soTien = (decimal)(50 * 1678 + 50 * 1734 + (hoaDon.ChiSoTieuThu - 100) * 2014); // Bậc 3: 100 - 200 kWh
+                soTien = (decimal)(50 * 1678 + 50 * 1734 + (chisotieuthu - 100) * 2014); // Bậc 3: 100 - 200 kWh
             }
-            else if (hoaDon.ChiSoTieuThu <= 300)
+            else if (chisotieuthu <= 300)
             {
-                soTien = (decimal)(50 * 1678 + 50 * 1734 + 100 * 2014 + (hoaDon.ChiSoTieuThu - 200) * 2536); // Bậc 4: 200 - 300 kWh
+                soTien = (decimal)(50 * 1678 + 50 * 1734 + 100 * 2014 + (chisotieuthu - 200) * 2536); // Bậc 4: 200 - 300 kWh
             }
-            else if (hoaDon.ChiSoTieuThu <= 400)
+            else if (chisotieuthu <= 400)
             {
-                soTien = (decimal)(50 * 1678 + 50 * 1734 + 100 * 2014 + 100 * 2536 + (hoaDon.ChiSoTieuThu - 300) * 2834); // Bậc 5: 300 - 400 kWh
+                soTien = (decimal)(50 * 1678 + 50 * 1734 + 100 * 2014 + 100 * 2536 + (chisotieuthu - 300) * 2834); // Bậc 5: 300 - 400 kWh
             }
-            else if (hoaDon.ChiSoTieuThu > 400)
+            else if (chisotieuthu > 400)
             {
-                soTien = (decimal)(50 * 1678 + 50 * 1734 + 100 * 2014 + 100 * 2536 + 100 * 2834 + (hoaDon.ChiSoTieuThu - 400) * 2927); // Bậc 6: 400 - 500 kWh
+                soTien = (decimal)(50 * 1678 + 50 * 1734 + 100 * 2014 + 100 * 2536 + 100 * 2834 + (chisotieuthu - 400) * 2927); // Bậc 6: 400 - 500 kWh
             }
 
             // Tính và lưu thuế là 8% của số tiền cần thanh toán
             decimal thue = soTien * 0.08m; // Multiply soTien directly
-            hoaDon.Thue = thue;
+            
             // Cộng số tiền thuế vào số tiền cần thanh toán
             soTien += thue + (hoaDon.SoNo ?? 0); // Use a default value of 0 if hoaDon.SoNo is null
 
@@ -170,13 +171,20 @@ namespace DienLuc.Areas.Admin.Controllers
 
         // POST: HoaDons/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // For more
+        // s, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("Tao")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaHd,MaNv,MaKh,MaChiTietSddien,NgayTao,NgayDenHan,NgayThanhToan,Thue,SoNo,SoTienCanThanhToan,SoTienDaThanhToan,HinhThucThanhToan,TrangThai,ChiSoCu,ChiSoMoi,ChiSoTieuThu")] HoaDon hoaDon)
+        public async Task<IActionResult> Create([Bind("MaHd,MaNv,MaKh,MaChiTietSddien,NgayTao,NgayDenHan,NgayThanhToan,SoNo,SoTienCanThanhToan,SoTienDaThanhToan,MaPtttoan,TrangThai,ChiSoCu,ChiSoMoi")] HoaDon hoaDon)
         {
-            
-                var exist = await _context.HoaDons.FirstOrDefaultAsync(c => c.MaChiTietSddien == hoaDon.MaChiTietSddien);
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "AccountEmployee"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
+            var exist = await _context.HoaDons.FirstOrDefaultAsync(c => c.MaChiTietSddien == hoaDon.MaChiTietSddien);
                 if (exist != null)
                 {
                     ModelState.AddModelError(string.Empty, "Hóa đơn cho chi tiết sử dụng điện này đã tồn tại");
@@ -217,9 +225,10 @@ namespace DienLuc.Areas.Admin.Controllers
                 {
                     hoaDon.SoTienCanThanhToan = TinhTien(hoaDon);
                 }
-
-                // Thêm hóa đơn vào context và lưu thay đổi
-                _context.Add(hoaDon);
+                var n = _context.NhanViens.FirstOrDefault(x => x.Matk == userId);
+                hoaDon.MaNv = n.MaNv;
+            // Thêm hóa đơn vào context và lưu thay đổi
+            _context.Add(hoaDon);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             
@@ -266,7 +275,7 @@ namespace DienLuc.Areas.Admin.Controllers
             ViewData["MaKh"] = maK;
             ViewData["MaDh"] = maDh;
             ViewData["MaNv"] = maNv;
-
+            ViewData["MaChiTietSddien"] = new SelectList(_context.PhuongThucThanhToans, "MaPttt", "PhuongPhapTt", hoaDon.MaChiTietSddien);
             // Nếu cần thiết, bạn có thể gửi dữ liệu khác vào ViewData tại đây
 
             return View(hoaDon);
@@ -279,7 +288,7 @@ namespace DienLuc.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("ChinhSua/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("MaHd,MaNv,MaKh,MaChiTietSddien,NgayTao,NgayDenHan,NgayThanhToan,Thue,SoNo,SoTienCanThanhToan,SoTienDaThanhToan,HinhThucThanhToan,TrangThai,ChiSoCu,ChiSoMoi,ChiSoTieuThu")] HoaDon hoaDon)
+        public async Task<IActionResult> Edit(string id, [Bind("MaHd,MaNv,MaKh,MaChiTietSddien,NgayTao,NgayDenHan,NgayThanhToan,SoNo,SoTienCanThanhToan,SoTienDaThanhToan,MaPtttoan,TrangThai,ChiSoCu,ChiSoMoi")] HoaDon hoaDon)
         {
             if (id != hoaDon.MaHd)
             {
@@ -290,7 +299,7 @@ namespace DienLuc.Areas.Admin.Controllers
             {
                 try
                 {
-                    hoaDon.ChiSoTieuThu = hoaDon.ChiSoMoi - hoaDon.ChiSoCu;
+                    
                     _context.Update(hoaDon);
                     await _context.SaveChangesAsync();
                 }

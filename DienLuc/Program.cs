@@ -16,6 +16,7 @@ builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
+builder.Services.AddHttpContextAccessor();
 
 // Move the configuration of Session before calling Build()
 var app = builder.Build();

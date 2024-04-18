@@ -53,11 +53,7 @@
                 <input asp-for="ChiSoMoi" class="form-control" readonly />
                 <span asp-validation-for="ChiSoMoi" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ChiSoTieuThu" class="control-label">Chỉ số tiêu thụ</label>
-                <input asp-for="ChiSoTieuThu" class="form-control" readonly />
-                <span asp-validation-for="ChiSoTieuThu" class="text-danger"></span>
-            </div>
+
 
             <!-- Các trường khác có thể chỉnh sửa -->
 
@@ -76,11 +72,7 @@
                 <input asp-for="NgayThanhToan" class="form-control" readonly />
                 <span asp-validation-for="NgayThanhToan" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Thue" class="control-label">Thuế</label>
-                <input asp-for="Thue" class="form-control" readonly />
-                <span asp-validation-for="Thue" class="text-danger"></span>
-            </div>
+
             <div class="form-group">
                 <label asp-for="SoNo" class="control-label">Số nợ</label>
                 <input asp-for="SoNo" class="form-control" type="number" readonly />
@@ -97,12 +89,10 @@
                 <span asp-validation-for="SoTienDaThanhToan" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="HinhThucThanhToan" class="control-label">Hình thức thanh toán</label>
-                <select asp-for="HinhThucThanhToan" class="form-control">
-                    <option value="Trực tiếp">Trực tiếp</option>
-                    <option value="Trực tuyến">Trực tuyến</option>
-                </select>
-                <span asp-validation-for="HinhThucThanhToan" class="text-danger"></span>
+                <label asp-for="MaPtttoanNavigation" class="control-label">Hình thức thanh toán</label>
+                <input asp-for="MaPtttoanNavigation" class="form-control"/>
+                    
+                <span asp-validation-for="MaPtttoanNavigation" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="TrangThai" class="control-label">Trạng thái</label>
