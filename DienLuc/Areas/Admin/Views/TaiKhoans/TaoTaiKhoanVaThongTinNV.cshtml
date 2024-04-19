@@ -13,7 +13,7 @@
 <body>
     <h2>Tạo tài khoản và thông tin nhân viên</h2>
     <form asp-action="TaoTaiKhoanVaThongTinNV" method="post">
-        <div asp-validation-summary="All" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         
         <div class="form-group">
             <label for="MaTk">Mã tài khoản:</label>
@@ -73,3 +73,9 @@
     </form>
 </body>
 </html>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -73,9 +73,16 @@ namespace DienLuc.Areas.KhachHang.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DangKy(TaiKhoanKhachHangViewModel viewModel)
         {
-            try
+
+            
+            // Nếu ModelState hợp lệ, tiến hành tạo tài khoản và khách hàng mới
+            if (ModelState.IsValid)
             {
-                // Tạo tài khoản
+                if (Check(viewModel))
+                {
+                    return View(viewModel);
+                }
+                // Kiểm tra xem email đã tồn tại chưa
                 var taiKhoan = new TaiKhoan
                 {
                     MaTk = viewModel.MaTk,
@@ -117,23 +124,61 @@ namespace DienLuc.Areas.KhachHang.Controllers
                     MaThue = viewModel.MaThue,
                     Email = viewModel.Email
                 };
-                
 
                 // Thêm khách hàng mới vào context và lưu vào cơ sở dữ liệu
                 _context.KhachHangs.Add(newKhachHang);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction("Login");
+
             }
-            catch (Exception ex)
-            {
-                // Xử lý lỗi ở đây, ví dụ: ghi log, gửi email thông báo lỗi, vv.
-                // Đồng thời bạn cũng có thể hiển thị thông báo lỗi cho người dùng ở đây
-                ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại sau.");
-                return View(viewModel); // Trả về view với model để hiển thị thông báo lỗi cho người dùng
-            }
+            return View(viewModel);
+
         }
 
+        public bool Check(TaiKhoanKhachHangViewModel viewModel)
+        {
+            bool check = false;
+            var existingEmail = _context.KhachHangs.Any(kh => kh.Email == viewModel.Email);
+            if (existingEmail)
+            {
+                ModelState.AddModelError(nameof(viewModel.Email), "Email đã được sử dụng.");
+                check = true;
+            }
+
+            // Kiểm tra xem mã thuế đã tồn tại chưa
+            var existingMaThue = _context.KhachHangs.Any(kh => kh.MaThue == viewModel.MaThue);
+            if (existingMaThue)
+            {
+                ModelState.AddModelError(nameof(viewModel.MaThue), "Mã thuế đã tồn tại.");
+                check = true;
+            }
+
+            // Kiểm tra xem số điện thoại đã tồn tại chưa
+            var existingSoDt = _context.KhachHangs.Any(kh => kh.SoDt == viewModel.SoDt);
+            if (existingSoDt)
+            {
+                ModelState.AddModelError(nameof(viewModel.SoDt), "Số điện thoại đã được sử dụng.");
+                check = true;
+            }
+
+            // Kiểm tra xem CCCD đã tồn tại chưa
+            var existingCccd = _context.KhachHangs.Any(kh => kh.Cccd == viewModel.Cccd);
+            if (existingCccd)
+            {
+                ModelState.AddModelError(nameof(viewModel.Cccd), "CCCD đã được sử dụng.");
+                check = true;
+            }
+
+            // Kiểm tra xem mã tài khoản đã tồn tại chưa
+            var existingMaTk = _context.TaiKhoans.Any(tk => tk.MaTk == viewModel.MaTk);
+            if (existingMaTk)
+            {
+                ModelState.AddModelError(nameof(viewModel.MaTk), "Mã tài khoản đã tồn tại.");
+                check = true;
+            }
+            return check;
+        }
         [HttpGet("ThongTinKhachHang")]
         public async Task<IActionResult> ThongTinKhachHang()
         {

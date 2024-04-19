@@ -49,35 +49,8 @@ namespace DienLuc.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Kiểm tra trùng lặp Số Điện Thoại
-                var existingPhone = await _context.NhanViens.FirstOrDefaultAsync(x => x.SoDt == viewModel.SoDt);
-                if (existingPhone != null)
+                if(Check(viewModel))
                 {
-                    ModelState.AddModelError(string.Empty, "Số điện thoại đã được sử dụng cho một nhân viên khác.");
-                    return View(viewModel);
-                }
-
-                // Kiểm tra trùng lặp Email
-                var existingEmail = await _context.NhanViens.FirstOrDefaultAsync(x => x.Email == viewModel.Email);
-                if (existingEmail != null)
-                {
-                    ModelState.AddModelError(string.Empty, "Email đã được sử dụng cho một nhân viên khác.");
-                    return View(viewModel);
-                }
-
-                // Kiểm tra trùng lặp Mã Nhân Viên
-                var existingMaNv = await _context.NhanViens.FirstOrDefaultAsync(x => x.MaNv == viewModel.MaNv);
-                if (existingMaNv != null)
-                {
-                    ModelState.AddModelError(string.Empty, "Mã nhân viên đã tồn tại.");
-                    return View(viewModel);
-                }
-
-                // Kiểm tra trùng lặp CCCD
-                var existingCCCD = await _context.NhanViens.FirstOrDefaultAsync(x => x.Cccd == viewModel.Cccd);
-                if (existingCCCD != null)
-                {
-                    ModelState.AddModelError(string.Empty, "CCCD đã được sử dụng cho một nhân viên khác.");
                     return View(viewModel);
                 }
 
@@ -115,10 +88,46 @@ namespace DienLuc.Areas.Admin.Controllers
 
                 return RedirectToAction("Index", "DongHoDiens");
             }
-
+            ViewData["VaiTro"] = new SelectList(_context.VaiTros, "MaVaiTro", "ViTri");
             return View(viewModel);
         }
+        public bool Check(TaiKhoanVaThongTinNVViewModel viewModel)
+        {
+            bool check = false;
+            // Kiểm tra trùng lặp Số Điện Thoại
+            var existingPhone = _context.NhanViens.Any(x => x.SoDt == viewModel.SoDt);
+            if (existingPhone)
+            {
+                ModelState.AddModelError(nameof(viewModel.SoDt), "Số điện thoại đã được sử dụng cho một nhân viên khác.");
+                check = true;
+            }
 
+            // Kiểm tra trùng lặp Email
+            var existingEmail = _context.NhanViens.Any(x => x.Email == viewModel.Email);
+            if (existingEmail)
+            {
+                ModelState.AddModelError(nameof(viewModel.Email), "Email đã được sử dụng cho một nhân viên khác.");
+                check = true;
+            }
+
+
+            // Kiểm tra trùng lặp CCCD
+            var existingCCCD =  _context.NhanViens.Any(x => x.Cccd == viewModel.Cccd);
+            if (existingCCCD)
+            {
+                ModelState.AddModelError(nameof(viewModel.Cccd), "CCCD đã được sử dụng cho một nhân viên khác.");
+                check = true;
+            }
+
+            // Kiểm tra xem mã tài khoản đã tồn tại chưa
+            var existingMaTk = _context.TaiKhoans.Any(tk => tk.MaTk == viewModel.MaTk);
+            if (existingMaTk)
+            {
+                ModelState.AddModelError(nameof(viewModel.MaTk), "Mã tài khoản đã tồn tại.");
+                check = true;
+            }
+            return check;
+        }
 
         // GET: NhanVien/Details/5
         [HttpGet("ThongTinNV")]
