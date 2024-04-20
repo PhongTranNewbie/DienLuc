@@ -30,6 +30,8 @@ namespace DienLuc.Controllers
 			return View();
 		}
 
+        
+
         [HttpGet("thanhtoan")]
         public IActionResult ThanhToan(string maHd)
         {
@@ -64,34 +66,15 @@ namespace DienLuc.Controllers
                                     .Take(_context.HoaDons.Count() - 1)
                                     .LastOrDefault();
 
-
-            if (hoaDonTruoc != null && hoaDonTruoc.TrangThai == "Còn nợ"
-				 || hoaDonTruoc != null && hoaDonTruoc.TrangThai == "Đã chuyển sang hóa đơn tiếp theo")
-			{
-				// Bạn có thể xử lý tại đây, ví dụ hiển thị thông báo yêu cầu thanh toán đầy đủ
-				ModelState.AddModelError(string.Empty, "Đồng hồ này có hóa đơn trước đó còn nợ và đã chuyển sang hóa đơn mới. Vui lòng thanh toán đầy đủ.");
-				return View(nameof(ThanhToan), hoaDon);
-			}
-
-			// Kiểm tra nếu hóa đơn trước đó vẫn còn nợ và số tiền thanh toán không đủ
-			if (hoaDon != null && hoaDonTruoc != null && hoaDonTruoc.TrangThai == "Còn nợ"
-				&& SoTienThanhToan < hoaDon.SoTienCanThanhToan)
-			{
-				ModelState.AddModelError(string.Empty, "Hóa đơn trước đó vẫn còn nợ và số tiền thanh toán không đủ. Vui lòng thanh toán số tiền đầy đủ.");
-				return View(nameof(ThanhToan), hoaDon);
-			}
-
 			hoaDon.NgayThanhToan = DateTime.Now;
 			hoaDon.SoTienDaThanhToan = SoTienThanhToan;
-			hoaDon.SoNo = hoaDon.SoTienCanThanhToan - hoaDon.SoTienDaThanhToan;
-			if (hoaDon.SoTienDaThanhToan >= hoaDon.SoTienCanThanhToan)
-			{
-				hoaDon.TrangThai = "Đã thanh toán";
-			}
-			else
-			{
-				hoaDon.TrangThai = "Còn nợ";
-			}
+            if(hoaDon.SoTienDaThanhToan <= 0)
+            {
+                ModelState.AddModelError(string.Empty, "Bạn không thể thanh toán nếu số tiền bé hơn hoặc bằng 0");
+                return View(hoaDon);
+
+            }
+			hoaDon.TrangThai = "Đã thanh toán";
 
 			_context.SaveChanges();
 
@@ -138,9 +121,9 @@ namespace DienLuc.Controllers
             var dtt = _context.HoaDons
 					.Include(x => x.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation)
 					.Where(x => x.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation.Matk == userid &&
-								(x.TrangThai == "Đã thanh toán" || x.TrangThai == "còn nợ"))
+								x.TrangThai == "Đã thanh toán")
 					.AsNoTracking()
-					.OrderBy(x => x.MaHd)
+					.OrderByDescending(x => x.MaHd)
 					.ToList();
 
             PagedList<HoaDon> tdt = new PagedList<HoaDon> (dtt, pageNumber, pageSize);
@@ -157,7 +140,7 @@ namespace DienLuc.Controllers
                     .Include(x => x.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation)
                     .Where(x => x.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation.Matk == userid)
                     .AsNoTracking()
-                    .OrderBy(x => x.MaHd)
+                    .OrderByDescending(x => x.MaHd)
                     .ToList();
 
             PagedList<HoaDon> tdt = new PagedList<HoaDon>(dtt, pageNumber, pageSize);

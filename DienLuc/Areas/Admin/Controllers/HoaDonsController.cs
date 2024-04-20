@@ -29,7 +29,7 @@ namespace DienLuc.Areas.Admin.Controllers
         {
             int pageSize = 12;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
-            var hoadon = _context.HoaDons.AsNoTracking().OrderBy(x => x.MaHd).Include(h => h.MaChiTietSddienNavigation).Include(h => h.MaChiTietSddienNavigation.MaDhNavigation);
+            var hoadon = _context.HoaDons.AsNoTracking().OrderByDescending(x => x.MaHd).Include(h => h.MaChiTietSddienNavigation).Include(h => h.MaChiTietSddienNavigation.MaDhNavigation);
             PagedList<HoaDon> mhd = new PagedList<HoaDon>(hoadon, pageNumber, pageSize);
             return View(mhd);
         }
@@ -131,6 +131,8 @@ namespace DienLuc.Areas.Admin.Controllers
         }
         private decimal TinhTien(HoaDon hoaDon)
         {
+            var hdmoinhat = _context.HoaDons.Where(x => x.MaChiTietSddien == hoaDon.MaChiTietSddien).OrderByDescending(x => x.NgayTao) .FirstOrDefault();
+            hoaDon.SoNo = hdmoinhat.SoTienCanThanhToan - hdmoinhat.SoTienDaThanhToan;
             decimal soTien = 0;
             // Chuyển % thuế thành số thập phân
             var chisotieuthu = hoaDon.ChiSoMoi - hoaDon.ChiSoCu;
@@ -164,7 +166,7 @@ namespace DienLuc.Areas.Admin.Controllers
             decimal thue = soTien * 0.08m; // Multiply soTien directly
             
             // Cộng số tiền thuế vào số tiền cần thanh toán
-            soTien += thue + (hoaDon.SoNo ?? 0); // Use a default value of 0 if hoaDon.SoNo is null
+            soTien += thue + hoaDon.SoNo; // Use a default value of 0 if hoaDon.SoNo is null
 
             return soTien;
         }
@@ -212,15 +214,6 @@ namespace DienLuc.Areas.Admin.Controllers
                     PopulateDropDownLists(hoaDon);
                     return View(hoaDon);
                 }
-                var MaDh = hoaDon?.MaChiTietSddienNavigation?.MaDh;
-                var hoaDonThangTruoc = _context.HoaDons
-                .Where(h => h.MaChiTietSddienNavigation != null && h.MaChiTietSddienNavigation.MaDh == MaDh)
-                .OrderBy(h => h.NgayTao)
-                .LastOrDefault();
-                if (hoaDonThangTruoc?.TrangThai == "Chưa thanh toán")
-                {
-                    hoaDonThangTruoc.TrangThai = "Đã chuyển vào hóa đơn tiếp theo";
-                }
                 if (hoaDon != null)
                 {
                     hoaDon.SoTienCanThanhToan = TinhTien(hoaDon);
@@ -228,7 +221,7 @@ namespace DienLuc.Areas.Admin.Controllers
                 var n = _context.NhanViens.FirstOrDefault(x => x.Matk == userId);
                 hoaDon.MaNv = n.MaNv;
             // Thêm hóa đơn vào context và lưu thay đổi
-            _context.Add(hoaDon);
+                _context.Add(hoaDon);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             

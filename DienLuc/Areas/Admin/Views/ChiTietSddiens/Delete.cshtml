@@ -17,6 +17,7 @@
 
 <div>
     <h4>Chi tiết sử dụng điện</h4>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <hr />
     <dl class="row">
         <div class="col-sm-auto">
@@ -45,4 +46,8 @@
 </div>
     
     
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }

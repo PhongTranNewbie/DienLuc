@@ -14,6 +14,9 @@
     <thead>
         <tr class="table-warning">
             <th>
+                Mã hóa đơn
+            </th>
+            <th>
                 Ngày tạo
             </th>
             <th>
@@ -46,7 +49,7 @@
             <th>
                 Mã khách hàng
             </th>
-            <th></th>
+
         </tr>
     </thead>
     <tbody>
@@ -63,6 +66,9 @@
                 cls = "table-primary";
             }
             <tr class="@cls">
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaHd)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.NgayTao)
                 </td>
@@ -81,7 +87,9 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.ChiSoMoi)
                 </td>
-
+                <td>
+                    @(item.ChiSoMoi - item.ChiSoCu)
+                </td>
                 <td>
                     @string.Format("{0:N0}", item.SoTienCanThanhToan)
                 </td>
@@ -101,11 +109,7 @@
 
 
 
-                <td>
-                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.MaHd">Chỉnh sửa</a> |
-                    <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.MaHd">Chi tiết</a> |
-                    <a class="btn btn-primary" asp-action="Delete" asp-route-id="@item.MaHd">Xóa</a>
-                </td>
+
             </tr>
         }
     </tbody>

@@ -17,11 +17,11 @@ public partial class HoaDon
 
     public DateTime? NgayThanhToan { get; set; }
 
-    public decimal? SoNo { get; set; }
+    public decimal SoNo = 0; 
 
     public decimal SoTienCanThanhToan { get; set; }
 
-    public decimal? SoTienDaThanhToan { get; set; }
+    public decimal SoTienDaThanhToan = 0;
 
     public string MaPtttoan { get; set; } = null!;
 

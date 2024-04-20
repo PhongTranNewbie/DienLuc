@@ -23,24 +23,29 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
+                <label asp-for="Id" class="control-label">Mã chi tiết sử dụng điện</label>
                 <input asp-for="Id" class="form-control" readonly/>
                 <span asp-validation-for="Id" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="MaDh" class="control-label">Mã đồng hồ</label>
-                <select asp-for="MaDh" class="form-control" asp-items="ViewBag.MaDh"></select>
+                <input asp-for="MaDh" class="form-control" readonly/>
                 <span asp-validation-for="MaDh" class="text-danger"></span>
             </div>
             
             <div class="form-group">
-                <label asp-for="MaNv" class="control-label"></label>
-                <select asp-for="MaNv" class="form-control" asp-items="ViewBag.MaNv"></select>
+                <label asp-for="MaNv" class="control-label">Mã nhân viên</label>
+                <input asp-for="MaNv" class="form-control" readonly/>
                 <span asp-validation-for="MaNv" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ChiSoDien" class="control-label" ></label>
-                <input asp-for="ChiSoDien" class="form-control" readonly />
+                <label asp-for="NgayLayThongTin" class="control-label">Ngày lấy thông tin</label>
+                <input asp-for="NgayLayThongTin" class="form-control" readonly/>
+                <span asp-validation-for="NgayLayThongTin" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChiSoDien" class="control-label" >Chỉ số điện</label>
+                <input asp-for="ChiSoDien" class="form-control" />
                 <span asp-validation-for="ChiSoDien" class="text-danger"></span>
             </div>
             <div class="form-group">

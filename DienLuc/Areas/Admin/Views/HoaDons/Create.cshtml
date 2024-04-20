@@ -51,7 +51,7 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="ChiSoMoi" class="control-label">Chỉ số mới</label>
-                    <input asp-for="ChiSoMoi" class="form-control" />
+                    <input asp-for="ChiSoMoi" class="form-control" readonly/>
                     <span asp-validation-for="ChiSoMoi" class="text-danger"></span>
                 </div>
 
@@ -61,12 +61,10 @@
                     <span asp-validation-for="NgayDenHan" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="TrangThai" class="control-label"></label>
+                    <label asp-for="TrangThai" class="control-label">Trạng thái</label>
                     <select asp-for="TrangThai" class="form-control">
                         <option value="Chưa thanh toán">Chưa thanh toán</option>
                         <option value="Đã thanh toán">Đã thanh toán</option>
-                        <option value="Còn nợ">Còn nợ</option>
-                        <option value="Đã chuyển vào hóa đơn tiếp theo">Đã chuyển vào hóa đơn tiếp theo</option>
                     </select>
                     <span asp-validation-for="TrangThai" class="text-danger"></span>
                 </div>

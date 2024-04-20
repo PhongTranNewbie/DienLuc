@@ -143,9 +143,9 @@ namespace DienLuc.Areas.Admin.Controllers
             }
 
             var chiTietSddien = await _context.ChiTietSddiens
-    .Include(c => c.MaDhNavigation)
-    .Include(c => c.MaNvNavigation)
-    .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(c => c.MaDhNavigation)
+                .Include(c => c.MaNvNavigation)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (chiTietSddien == null)
             {
                 return NotFound();
@@ -170,6 +170,16 @@ namespace DienLuc.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
+                // Kiểm tra xem chi tiết sử dụng điện đã được sử dụng để tạo hóa đơn chưa
+                var isUsedInInvoice = await _context.HoaDons.AnyAsync(hd => hd.MaChiTietSddien == id);
+
+                if (isUsedInInvoice)
+                {
+                    ModelState.AddModelError(string.Empty, "Không thể chỉnh sửa chi tiết sử dụng điện này vì đã được sử dụng để tạo hóa đơn.");
+                    ViewData["MaDh"] = new SelectList(_context.DongHoDiens, "MaDh", "MaDh", chiTietSddien.MaDh);
+                    ViewData["MaNv"] = new SelectList(_context.NhanViens, "MaNv", "MaNv", chiTietSddien.MaNv);
+                    return View("Edit", chiTietSddien);
+                }
                 try
                 {
 
@@ -220,17 +230,31 @@ namespace DienLuc.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var chiTietSddien = await _context.ChiTietSddiens
-    .Include(c => c.MaDhNavigation)
-    .Include(c => c.MaNvNavigation)
-    .FirstOrDefaultAsync(m => m.Id == id); ;
-            if (chiTietSddien != null)
+            if(ModelState.IsValid)
             {
-                _context.ChiTietSddiens.Remove(chiTietSddien);
-            }
+                var chiTietSddien = await _context.ChiTietSddiens
+                .Include(c => c.MaDhNavigation)
+                .Include(c => c.MaNvNavigation)
+                .FirstOrDefaultAsync(m => m.Id == id); ;
+                // Kiểm tra xem chi tiết sử dụng điện đã được sử dụng để tạo hóa đơn chưa
+                var isUsedInInvoice = await _context.HoaDons.AnyAsync(hd => hd.MaChiTietSddien == id);
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                if (isUsedInInvoice)
+                {
+                    ModelState.AddModelError(string.Empty, "Không thể xóa chi tiết sử dụng điện này vì đã được sử dụng để tạo hóa đơn.");
+                    return View("Delete", chiTietSddien);
+                }
+
+                if (chiTietSddien != null)
+                {
+                    _context.ChiTietSddiens.Remove(chiTietSddien);
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ModelState.AddModelError(string.Empty, "Không thể xóa chi tiết sử dụng điện này vì đã được sử dụng để tạo hóa đơn.");
+            return RedirectToAction(nameof(Delete));
         }
 
         private bool ChiTietSddienExists(int id)
