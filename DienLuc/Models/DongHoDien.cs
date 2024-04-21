@@ -11,7 +11,7 @@ public partial class DongHoDien
 
     public string? TrangThai { get; set; }
 
-    public DateOnly? NgayCapNhatTrangThai { get; set; }
+    public DateOnly? NgayHoatDong { get; set; }
 
     public string? LoaiDhd { get; set; }
 

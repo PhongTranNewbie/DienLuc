@@ -1,0 +1,54 @@
+﻿@model DienLuc.Models.NhanVien
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chỉnh sửa thông tin nhân viên</title>
+</head>
+<body>
+    <h2>Chỉnh sửa thông tin nhân viên</h2>
+    <form asp-action="ChinhSuaThongTin" method="post">
+        <div>
+            <label class="control-label" for="Ho">Họ:</label>
+            <input class="form-control" type="text" id="Ho" name="Ho" value="@Model.Ho" required>
+            <span asp-validation-for="Ho" class="text-danger"></span>
+
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="Ten">Tên:</label>
+            <input class="form-control" type="text" id="Ten" name="Ten" value="@Model.Ten" required>
+            <span asp-validation-for="Ten" class="text-danger"></span>
+
+        </div>
+        <div>
+            <label class="control-label" for="NgaySinh">Ngày sinh:</label>
+            <input class="form-control" type="date" id="NgaySinh" name="NgaySinh" value="@Model.NgaySinh.ToString("yyyy-MM-dd")" required>
+            <span asp-validation-for="NgaySinh" class="text-danger"></span>
+
+        </div>
+        <div>
+            <label class="control-label" for="DiaChi">Địa chỉ:</label>
+            <input class="form-control" type="text" id="DiaChi" name="DiaChi" value="@Model.DiaChi" required>
+            <span asp-validation-for="DiaChi" class="text-danger"></span>
+
+        </div>
+        <div>
+            <label class="control-label" for="SoDt">Số điện thoại:</label>
+            <input class="form-control" type="text" id="SoDt" name="SoDt" value="@Model.SoDt" required>
+            <span asp-validation-for="SoDt" class="text-danger"></span>
+
+        </div>
+        <div>
+            <label class="control-label" for="Cccd">CCCD:</label>
+            <input class="form-control" type="text" id="Cccd" name="Cccd" value="@Model.Cccd" required>
+            <span asp-validation-for="Cccd" class="text-danger"></span>
+
+        </div>
+        <div>
+            <input class="btn btn-primary" type="submit" value="Lưu thay đổi">
+        </div>
+   </form>
+   </body>
+   </html>

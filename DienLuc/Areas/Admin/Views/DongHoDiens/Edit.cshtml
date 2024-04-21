@@ -1,0 +1,65 @@
+﻿@model DienLuc.Models.DongHoDien
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+
+<div class="page-header">
+    <nav style="--cui-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Danh sách đồng hồ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+        </ol>
+    </nav>
+</div>
+<hr />
+<div class="row">
+    <h1>Chỉnh sửa</h1>
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="MaDh" class="control-label">Mã đồng hồ</label>
+                <input asp-for="MaDh" class="form-control" readonly/>
+                <span asp-validation-for="MaDh" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaKh" class="control-label">Mã khách hàng</label>
+                <select asp-for="MaKh" class="form-control" asp-items="ViewBag.MaKh"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="TrangThai" class="control-label">Trạng thái</label>
+                <select asp-for="TrangThai" class="form-control">
+                    <option value="Đang hoạt động">Đang hoạt động</option>
+                    <option value="Đã tạm dừng hoạt động">Đã tạm dừng hoạt động</option>
+                    <option value="Đã hỏng">Đã hỏng</option>
+                </select>
+                <span asp-validation-for="TrangThai" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="NgayHoatDong" class="control-label">Ngày hoạt động</label>
+                <input asp-for="NgayHoatDong" class="form-control"  readonly/>
+                <span asp-validation-for="NgayHoatDong" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LoaiDhd" class="control-label">Loại đồng hồ</label>
+                <select asp-for="LoaiDhd" class="form-control">
+                    <option value="Đĩa xoay">Đĩa xoay</option>
+                    <option value="Điện tử">Điện tử</option>
+                </select>
+                <span asp-validation-for="LoaiDhd" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Chỉnh sửa" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

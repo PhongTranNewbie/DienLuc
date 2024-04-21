@@ -1,0 +1,53 @@
+﻿@model DienLuc.Models.ChiTietSddien
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<div class="page-header">
+    <nav style="--cui-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Danh muc chi tiết sử dụng điện</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+        </ol>
+    </nav>
+</div>
+
+<div>
+    <h4>Chi tiết sử dụng điện</h4>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <hr />
+    <dl class="row">
+        <div class="col-sm-auto">
+            <label for="Id" class="col-form-label">Id</label>
+            <input type="text" id="Id" class="form-control" value="@Model.Id" readonly>
+        </div>
+       
+        <div class="col-sm-auto">
+            <label for="MaDh" class="col-form-label">Mã đồng hồ</label>
+            <input type="text" id="MaDh" class="form-control" value="@Model.MaDh" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="MaNv" class="col-form-label">Ngày tạo</label>
+            <input type="text" id="Manv" class="form-control" value="@Model.MaNv" readonly>
+        </div>
+        <div class="col-sm-auto">
+            <label for="ChiSoDien" class="col-form-label">Chỉ số điện</label>
+            <input type="text" id="ChiSoDien" class="form-control" value="@Model.ChiSoDien" readonly>
+        </div>
+    </dl>
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="MaDh" />
+        <input type="hidden" asp-for="NgayLayThongTin" />
+        <input type="submit" value="Xóa" class="btn btn-danger" /> 
+    </form>
+</div>
+    
+    
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }

@@ -23,15 +23,21 @@ public partial class DienLucContext : DbContext
 
     public virtual DbSet<KhachHang> KhachHangs { get; set; }
 
+    public virtual DbSet<LoaiTaiKhoan> LoaiTaiKhoans { get; set; }
+
     public virtual DbSet<NhanVien> NhanViens { get; set; }
+
+    public virtual DbSet<PhuongThucThanhToan> PhuongThucThanhToans { get; set; }
 
     public virtual DbSet<TaiKhoan> TaiKhoans { get; set; }
 
     public virtual DbSet<ThongBao> ThongBaos { get; set; }
 
+    public virtual DbSet<VaiTro> VaiTros { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=LAPTOP-LDNCHQAF;Initial Catalog=DienLuc (3);Integrated Security=True;TrustServerCertificate=True");
+        => optionsBuilder.UseSqlServer("Server=MSI\\SQLSEVER2022DEV;Database=DienLuc;trusted_connection=yes;Encrypt=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -101,29 +107,38 @@ public partial class DienLucContext : DbContext
                 .HasMaxLength(10)
                 .IsFixedLength()
                 .HasColumnName("MaHD");
-            entity.Property(e => e.HinhThucThanhToan).HasMaxLength(50);
             entity.Property(e => e.MaChiTietSddien).HasColumnName("MaChiTietSDDien");
             entity.Property(e => e.MaNv)
                 .HasMaxLength(10)
                 .IsFixedLength()
                 .HasColumnName("MaNV");
+            entity.Property(e => e.MaPtttoan)
+                .HasMaxLength(10)
+                .IsFixedLength()
+                .HasColumnName("MaPTTToan");
             entity.Property(e => e.NgayDenHan).HasColumnType("datetime");
             entity.Property(e => e.NgayTao).HasColumnType("datetime");
             entity.Property(e => e.NgayThanhToan).HasColumnType("datetime");
             entity.Property(e => e.SoNo).HasColumnType("decimal(12, 0)");
             entity.Property(e => e.SoTienCanThanhToan).HasColumnType("decimal(12, 0)");
             entity.Property(e => e.SoTienDaThanhToan).HasColumnType("decimal(12, 0)");
-            entity.Property(e => e.Thue).HasColumnType("decimal(12, 0)");
             entity.Property(e => e.TrangThai).HasMaxLength(50);
 
             entity.HasOne(d => d.MaChiTietSddienNavigation).WithOne(p => p.HoaDon)
                 .HasPrincipalKey<ChiTietSddien>(p => p.Id)
                 .HasForeignKey<HoaDon>(d => d.MaChiTietSddien)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_HoaDon_ChiTietSDDien");
 
             entity.HasOne(d => d.MaNvNavigation).WithMany(p => p.HoaDons)
                 .HasForeignKey(d => d.MaNv)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_HoaDon_NhanVien2");
+
+            entity.HasOne(d => d.MaPtttoanNavigation).WithMany(p => p.HoaDons)
+                .HasForeignKey(d => d.MaPtttoan)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_HoaDon_PhuongThucThanhToan");
         });
 
         modelBuilder.Entity<KhachHang>(entity =>
@@ -133,6 +148,10 @@ public partial class DienLucContext : DbContext
             entity.ToTable("KhachHang");
 
             entity.HasIndex(e => e.Matk, "IX_KhachHang").IsUnique();
+
+            entity.HasIndex(e => e.Cccd, "IX_KhachHang_1").IsUnique();
+
+            entity.HasIndex(e => e.SoDt, "IX_KhachHang_2").IsUnique();
 
             entity.Property(e => e.MaKh)
                 .HasMaxLength(10)
@@ -146,7 +165,7 @@ public partial class DienLucContext : DbContext
                 .HasMaxLength(10)
                 .IsFixedLength();
             entity.Property(e => e.Matk)
-                .HasMaxLength(25)
+                .HasMaxLength(50)
                 .IsFixedLength()
                 .HasColumnName("MATK");
             entity.Property(e => e.SoDt)
@@ -157,7 +176,23 @@ public partial class DienLucContext : DbContext
 
             entity.HasOne(d => d.MatkNavigation).WithOne(p => p.KhachHang)
                 .HasForeignKey<KhachHang>(d => d.Matk)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_KhachHang_TaiKhoan");
+        });
+
+        modelBuilder.Entity<LoaiTaiKhoan>(entity =>
+        {
+            entity.HasKey(e => e.MaLoaiTk);
+
+            entity.ToTable("LoaiTaiKhoan");
+
+            entity.Property(e => e.MaLoaiTk)
+                .HasMaxLength(10)
+                .IsFixedLength()
+                .HasColumnName("MaLoaiTK");
+            entity.Property(e => e.TenLoaiTk)
+                .HasMaxLength(20)
+                .HasColumnName("TenLoaiTK");
         });
 
         modelBuilder.Entity<NhanVien>(entity =>
@@ -178,17 +213,40 @@ public partial class DienLucContext : DbContext
                 .HasColumnName("CCCD");
             entity.Property(e => e.Ho).HasMaxLength(25);
             entity.Property(e => e.Matk)
-                .HasMaxLength(25)
+                .HasMaxLength(50)
                 .IsFixedLength()
                 .HasColumnName("MATK");
             entity.Property(e => e.SoDt)
                 .HasMaxLength(11)
                 .HasColumnName("SoDT");
             entity.Property(e => e.Ten).HasMaxLength(25);
+            entity.Property(e => e.VaiTro)
+                .HasMaxLength(10)
+                .IsFixedLength();
 
             entity.HasOne(d => d.MatkNavigation).WithOne(p => p.NhanVien)
                 .HasForeignKey<NhanVien>(d => d.Matk)
-                .HasConstraintName("FK_NhanVien_TaiKhoan1");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_NhanVien_TaiKhoan");
+
+            entity.HasOne(d => d.VaiTroNavigation).WithMany(p => p.NhanViens)
+                .HasForeignKey(d => d.VaiTro)
+                .HasConstraintName("FK_NhanVien_VaiTro");
+        });
+
+        modelBuilder.Entity<PhuongThucThanhToan>(entity =>
+        {
+            entity.HasKey(e => e.MaPttt);
+
+            entity.ToTable("PhuongThucThanhToan");
+
+            entity.Property(e => e.MaPttt)
+                .HasMaxLength(10)
+                .IsFixedLength()
+                .HasColumnName("MaPTTT");
+            entity.Property(e => e.PhuongPhapTt)
+                .HasMaxLength(30)
+                .HasColumnName("PhuongPhapTT");
         });
 
         modelBuilder.Entity<TaiKhoan>(entity =>
@@ -198,13 +256,21 @@ public partial class DienLucContext : DbContext
             entity.ToTable("TaiKhoan");
 
             entity.Property(e => e.MaTk)
-                .HasMaxLength(25)
+                .HasMaxLength(50)
                 .IsFixedLength()
                 .HasColumnName("MaTK");
-            entity.Property(e => e.LoaiTk).HasColumnName("LoaiTK");
+            entity.Property(e => e.LoaiTk)
+                .HasMaxLength(10)
+                .IsFixedLength()
+                .HasColumnName("LoaiTK");
             entity.Property(e => e.Mk)
                 .HasMaxLength(25)
                 .HasColumnName("MK");
+
+            entity.HasOne(d => d.LoaiTkNavigation).WithMany(p => p.TaiKhoans)
+                .HasForeignKey(d => d.LoaiTk)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TaiKhoan_LoaiTaiKhoan");
         });
 
         modelBuilder.Entity<ThongBao>(entity =>
@@ -219,7 +285,20 @@ public partial class DienLucContext : DbContext
 
             entity.HasOne(d => d.MaHdNavigation).WithMany(p => p.ThongBaos)
                 .HasForeignKey(d => d.MaHd)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ThongBao_HoaDon");
+        });
+
+        modelBuilder.Entity<VaiTro>(entity =>
+        {
+            entity.HasKey(e => e.MaVaiTro);
+
+            entity.ToTable("VaiTro");
+
+            entity.Property(e => e.MaVaiTro)
+                .HasMaxLength(10)
+                .IsFixedLength();
+            entity.Property(e => e.ViTri).HasMaxLength(50);
         });
 
         OnModelCreatingPartial(modelBuilder);

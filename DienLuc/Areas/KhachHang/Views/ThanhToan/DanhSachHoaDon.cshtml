@@ -1,0 +1,116 @@
+﻿@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<HoaDon>
+@{
+    Layout = "~/Areas/KhachHang/Views/Shared/_LayoutKH.cshtml";
+}
+<h2>Danh sách hóa đơn</h2>
+
+<table class="table">
+    <thead>
+        <tr class="table-warning">
+            <th>
+                Mã hóa đơn
+            </th>
+            <th>
+                Ngày tạo
+            </th>
+            <th>
+                Ngày đến hạn
+            </th>
+            <th>
+                Ngày thanh toán
+            </th>
+            <th>
+                Trạng thái
+            </th>
+            <th>
+                Chỉ số cũ
+            </th>
+            <th>
+                Chỉ số mới
+            </th>
+            <th>
+                Chỉ số tiêu thụ
+            </th>
+            <th>
+                Số tiền cần thanh toán
+            </th>
+            <th>
+                Số tiền đã thanh toán
+            </th>
+            <th>
+                Mã đồng hồ
+            </th>
+            <th>
+                Mã khách hàng
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 0;
+            string @cls = "table-success";
+        }
+        @foreach (var hoaDon in Model)
+        {
+            i = i + 1;
+            cls = "table-success";
+            if (i % 2 == 0)
+            {
+                cls = "table-primary";
+            }
+            <tr class="@cls">
+                <td>
+                    @Html.DisplayFor(modelItem => hoaDon.MaHd)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => hoaDon.NgayTao)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => hoaDon.NgayDenHan)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => hoaDon.NgayThanhToan)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => hoaDon.TrangThai)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => hoaDon.ChiSoCu)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => hoaDon.ChiSoMoi)
+                </td>
+                <td>
+                    @(hoaDon.ChiSoMoi - hoaDon.ChiSoCu)
+                </td>
+                <td>
+                    @string.Format("{0:N0}", hoaDon.SoTienCanThanhToan)
+                </td>
+                <td>
+                    @string.Format("{0:N0}", hoaDon.SoTienDaThanhToan)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => hoaDon.MaChiTietSddienNavigation.MaDh)
+                </td>
+
+                <td>
+
+                    @Html.DisplayFor(modelItem => hoaDon.MaChiTietSddienNavigation.MaDhNavigation.MaKh)
+
+                </td>
+                <td>
+                    <a asp-controller="ThanhToan" asp-action="ThanhToan" asp-route-maHd="@hoaDon.MaHd" class="btn btn-primary">Thanh toán</a>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+{
+    LiElementClasses = new string[] { "page-item" },
+    PageClasses = new string[] { "page-link" }
+})

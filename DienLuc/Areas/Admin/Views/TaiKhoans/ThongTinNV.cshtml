@@ -1,0 +1,76 @@
+﻿@model DienLuc.Models.NhanVien
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Thông tin nhân viên</title>
+    <style>
+        .info-row {
+            display: flex;
+            margin-bottom: 10px; /* Khoảng cách giữa mỗi cặp label và value */
+        }
+
+        .info-label {
+            flex: 1; /* label chiếm 1 phần */
+            font-weight: bold; /* Làm đậm chữ */
+        }
+
+        .info-value {
+            flex: 2; /* value chiếm 2 phần */
+        }
+
+    </style>
+</head>
+<body>
+    <div>
+        <h3>Thông tin nhân viên</h3>
+        <div class="info-row">
+            <div class="info-label">Mã nhân viên:</div>
+            <div class="info-value">@Model.MaNv</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">CCCD:</div>
+            <div class="info-value">@Model.Cccd</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Họ:</div>
+            <div class="info-value">@Model.Ho</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Tên:</div>
+            <div class="info-value">@Model.Ten</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Ngày sinh:</div>
+            <div class="info-value">@Model.NgaySinh</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Địa chỉ:</div>
+            <div class="info-value">@Model.DiaChi</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Số điện thoại:</div>
+            <div class="info-value">@Model.SoDt</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Email:</div>
+            <div class="info-value">@Model.Email</div>
+        </div>
+
+    </div>
+    <a asp-action="ChinhSuaThongTin" asp-controller="TaiKhoans" class="btn btn-primary">Chỉnh sửa thông tin</a>
+
+</body>
+</html>

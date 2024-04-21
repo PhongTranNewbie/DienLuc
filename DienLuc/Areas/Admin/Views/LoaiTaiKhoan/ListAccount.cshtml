@@ -1,0 +1,48 @@
+﻿@model IEnumerable<DienLuc.Models.LoaiTaiKhoan>
+
+@{
+    ViewData["Title"] = "Loai tai khoan";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    
+}
+
+<h1>Danh sách loại tài khoản</h1>
+<p>
+    <a class="btn btn-primary" asp-action="CreateAccount">Thêm mới</a>
+</p>
+<table class="table">
+    <thead>
+        <tr class="table-warning">
+            <th>
+                Mã loại 
+            </th>
+            <th>
+                Tên loại tài khoản
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 0;
+            string @cls = "table-success";
+        }
+        @foreach (var item in Model)
+        {
+            i = i + 1;
+            cls = "table-success";
+            if (i % 2 == 0)
+            {
+                cls = "table-primary";
+            }
+            <tr class="@cls">
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaLoaiTk)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TenLoaiTk)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

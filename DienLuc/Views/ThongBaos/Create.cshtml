@@ -22,11 +22,14 @@
                 <select asp-for="MaHd" class ="form-control" asp-items="ViewBag.MaHd"></select>
             </div>
             <div class="form-group">
+<<<<<<< HEAD
                 <label asp-for="Email" class="control-label"></label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
+=======
+>>>>>>> 152607a697303a3d877d99bc8033063ec6db92f4
                 <label asp-for="NgayThongBao" class="control-label"></label>
                 <input asp-for="NgayThongBao" class="form-control" />
                 <span asp-validation-for="NgayThongBao" class="text-danger"></span>
@@ -47,3 +50,9 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+<<<<<<< HEAD
+=======
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+>>>>>>> 152607a697303a3d877d99bc8033063ec6db92f4

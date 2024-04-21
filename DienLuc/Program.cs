@@ -23,6 +23,7 @@ builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
+builder.Services.AddHttpContextAccessor();
 
 // Add email configuration and email sender service
 builder.Services.AddTransient<IEmailSender, EmailSender>();

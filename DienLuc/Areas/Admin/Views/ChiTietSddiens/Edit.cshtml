@@ -1,0 +1,60 @@
+﻿@model DienLuc.Models.ChiTietSddien
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<div class="page-header">
+    <nav style="--cui-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Danh muc chi tiết sử dụng điện</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+        </ol>
+    </nav>
+</div>
+
+<hr />
+<div class="row">
+    <h4>Chỉnh sửa</h4>
+
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Id" class="control-label">Mã chi tiết sử dụng điện</label>
+                <input asp-for="Id" class="form-control" readonly/>
+                <span asp-validation-for="Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaDh" class="control-label">Mã đồng hồ</label>
+                <input asp-for="MaDh" class="form-control" readonly/>
+                <span asp-validation-for="MaDh" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="MaNv" class="control-label">Mã nhân viên</label>
+                <input asp-for="MaNv" class="form-control" readonly/>
+                <span asp-validation-for="MaNv" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NgayLayThongTin" class="control-label">Ngày lấy thông tin</label>
+                <input asp-for="NgayLayThongTin" class="form-control" readonly/>
+                <span asp-validation-for="NgayLayThongTin" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChiSoDien" class="control-label" >Chỉ số điện</label>
+                <input asp-for="ChiSoDien" class="form-control" />
+                <span asp-validation-for="ChiSoDien" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Lưu" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

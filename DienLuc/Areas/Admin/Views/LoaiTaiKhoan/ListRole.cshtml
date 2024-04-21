@@ -1,0 +1,48 @@
+﻿@model IEnumerable<DienLuc.Models.VaiTro>
+
+@{
+    ViewData["Title"] = "Vai Tro";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<h1>Danh sách vai trò</h1>
+<p>
+    <a class="btn btn-primary" asp-action="CreateRole">Thêm mới</a>
+</p>
+<table class="table">
+    <thead>
+        <tr class="table-warning">
+            <th>
+                Mã vai trò
+            </th>
+            <th>
+                Tên vai trò
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 0;
+            string @cls = "table-success";
+        }
+        @foreach (var item in Model)
+        {
+            i = i + 1;
+            cls = "table-success";
+            if (i % 2 == 0)
+            {
+                cls = "table-primary";
+            }
+            <tr class="@cls">
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaVaiTro)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ViTri)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
