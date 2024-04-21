@@ -1,5 +1,12 @@
 using DienLuc.Models;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
+using DienLuc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,10 +24,12 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 
-// Move the configuration of Session before calling Build()
+// Add email configuration and email sender service
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+
 var app = builder.Build();
 
-// Add UseSession() to the pipeline
+// Move the configuration of Session before calling Build()
 app.UseSession();
 
 // Configure the HTTP request pipeline.
@@ -59,6 +68,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action}/{id?}",
     defaults: new { controller = "TaiKhoan", action = "Create" }); // Update default route
-
 
 app.Run();
