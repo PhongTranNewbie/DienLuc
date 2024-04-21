@@ -6,17 +6,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DienLuc.Models;
-<<<<<<< HEAD
+
 using DienLuc;
-=======
->>>>>>> 152607a697303a3d877d99bc8033063ec6db92f4
+
 
 namespace DienLuc.Controllers
 {
     public class ThongBaosController : Controller
     {
         private readonly DienLucContext _context;
-<<<<<<< HEAD
+
         private readonly IEmailSender _emailSender;
 
         public ThongBaosController(DienLucContext context, IEmailSender emailSender)
@@ -24,14 +23,12 @@ namespace DienLuc.Controllers
             _context = context;
             _emailSender = emailSender;
         }
-=======
 
         public ThongBaosController(DienLucContext context)
         {
             _context = context;
         }
 
->>>>>>> 152607a697303a3d877d99bc8033063ec6db92f4
         // GET: ThongBaos
         public async Task<IActionResult> Index()
         {
@@ -70,23 +67,17 @@ namespace DienLuc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-<<<<<<< HEAD
-        public async Task<IActionResult> Create([Bind("Id,MaHd,Email,NgayThongBao,NoiDung")] ThongBao thongBao)
-=======
+
         public async Task<IActionResult> Create([Bind("Id,MaHd,NgayThongBao,NoiDung")] ThongBao thongBao)
->>>>>>> 152607a697303a3d877d99bc8033063ec6db92f4
         {
             if (ModelState.IsValid)
             {
                 _context.Add(thongBao);
                 await _context.SaveChangesAsync();
-<<<<<<< HEAD
-
+                
                 // Gửi email
-                await _emailSender.SendEmailAsync(thongBao.Email, "New Thong Bao Created", $"MaHd: {thongBao.MaHd}, NgayThongBao: {thongBao.NgayThongBao}, NoiDung: {thongBao.NoiDung}");
+                //await _emailSender.SendEmailAsync(a, "Thông báo đã được gủi", $"Mã hóa đơn: {thongBao.MaHd}, Ngày thông báo: {thongBao.NgayThongBao}, Nội dụng: {thongBao.NoiDung}");//
 
-=======
->>>>>>> 152607a697303a3d877d99bc8033063ec6db92f4
                 return RedirectToAction(nameof(Index));
             }
             ViewData["MaHd"] = new SelectList(_context.HoaDons, "MaHd", "MaHd", thongBao.MaHd);
@@ -115,11 +106,8 @@ namespace DienLuc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-<<<<<<< HEAD
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MaHd,Email,NgayThongBao,NoiDung")] ThongBao thongBao)
-=======
+
         public async Task<IActionResult> Edit(int id, [Bind("Id,MaHd,NgayThongBao,NoiDung")] ThongBao thongBao)
->>>>>>> 152607a697303a3d877d99bc8033063ec6db92f4
         {
             if (id != thongBao.Id)
             {

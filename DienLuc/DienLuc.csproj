@@ -63,13 +63,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
-<<<<<<< HEAD
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-=======
     <PackageReference Include="X.PagedList" Version="9.1.2" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="9.1.2" />
     <PackageReference Include="X.PagedList.Web.Common" Version="8.0.7" />
->>>>>>> 152607a697303a3d877d99bc8033063ec6db92f4
   </ItemGroup>
 
 </Project>
