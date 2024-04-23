@@ -63,20 +63,26 @@ namespace DienLuc.Controllers
         }
 
         // POST: ThongBaos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-
         public async Task<IActionResult> Create([Bind("Id,MaHd,NgayThongBao,NoiDung")] ThongBao thongBao)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(thongBao);
                 await _context.SaveChangesAsync();
-                
-                // Gửi email
-                //await _emailSender.SendEmailAsync(a, "Thông báo đã được gủi", $"Mã hóa đơn: {thongBao.MaHd}, Ngày thông báo: {thongBao.NgayThongBao}, Nội dụng: {thongBao.NoiDung}");//
+
+                // Lấy MaHd của thông báo
+                var maHd = thongBao.MaHd;
+
+                // Tìm khách hàng tương ứng với MaHd
+                var khachHang = await _context.KhachHangs.FirstOrDefaultAsync(kh => kh.MaKh == maHd);
+
+                if (khachHang != null)
+                {
+                    // Gửi email đến địa chỉ email của khách hàng
+                    await _emailSender.SendEmailAsync(khachHang.Email, "Thông báo mới từ hệ thống", $"Bạn có thông báo mới. Nội dung: {thongBao.NoiDung}");
+                }
 
                 return RedirectToAction(nameof(Index));
             }
