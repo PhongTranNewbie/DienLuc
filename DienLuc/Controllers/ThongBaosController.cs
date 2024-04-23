@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DienLuc.Models;
-
-using DienLuc;
+using DienLuc.Services;
 
 
 namespace DienLuc.Controllers
@@ -15,7 +14,6 @@ namespace DienLuc.Controllers
     public class ThongBaosController : Controller
     {
         private readonly DienLucContext _context;
-
         private readonly IEmailSender _emailSender;
 
         public ThongBaosController(DienLucContext context, IEmailSender emailSender)
@@ -74,102 +72,19 @@ namespace DienLuc.Controllers
             {
                 _context.Add(thongBao);
                 await _context.SaveChangesAsync();
-                
+
                 // Gửi email
-                //await _emailSender.SendEmailAsync(a, "Thông báo đã được gủi", $"Mã hóa đơn: {thongBao.MaHd}, Ngày thông báo: {thongBao.NgayThongBao}, Nội dụng: {thongBao.NoiDung}");//
+                var email = _context.HoaDons.
+                    Where(x => x.MaHd == thongBao.MaHd)
+                    .Include(x => x.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation)
+                    .Select(x => x.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation.Email)
+                    .FirstOrDefault();
+                await _emailSender.SendEmailAsync(email, "Thông báo đã được gửi", $"Mã hóa đơn: {thongBao.MaHd}, Ngày thông báo: {thongBao.NgayThongBao}, Nội dụng: {thongBao.NoiDung}");
 
                 return RedirectToAction(nameof(Index));
             }
             ViewData["MaHd"] = new SelectList(_context.HoaDons, "MaHd", "MaHd", thongBao.MaHd);
             return View(thongBao);
-        }
-
-        // GET: ThongBaos/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var thongBao = await _context.ThongBaos.FindAsync(id);
-            if (thongBao == null)
-            {
-                return NotFound();
-            }
-            ViewData["MaHd"] = new SelectList(_context.HoaDons, "MaHd", "MaHd", thongBao.MaHd);
-            return View(thongBao);
-        }
-
-        // POST: ThongBaos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MaHd,NgayThongBao,NoiDung")] ThongBao thongBao)
-        {
-            if (id != thongBao.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(thongBao);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ThongBaoExists(thongBao.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["MaHd"] = new SelectList(_context.HoaDons, "MaHd", "MaHd", thongBao.MaHd);
-            return View(thongBao);
-        }
-
-        // GET: ThongBaos/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var thongBao = await _context.ThongBaos
-                .Include(t => t.MaHdNavigation)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (thongBao == null)
-            {
-                return NotFound();
-            }
-
-            return View(thongBao);
-        }
-
-        // POST: ThongBaos/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var thongBao = await _context.ThongBaos.FindAsync(id);
-            if (thongBao != null)
-            {
-                _context.ThongBaos.Remove(thongBao);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool ThongBaoExists(int id)
