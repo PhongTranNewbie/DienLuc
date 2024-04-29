@@ -20,7 +20,7 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("DangNhap")]
         public IActionResult Login()
         {
-            if (HttpContext.Session.GetString("MaTk") == null || HttpContext.Session.GetString("LoaiTk") != "2")
+            if (HttpContext.Session.GetString("MaTk") == null || HttpContext.Session.GetString("LoaiTk") != "TK2")
             {
                 // Check if there is no logged-in user or the logged-in user is not an admin
                 return View();

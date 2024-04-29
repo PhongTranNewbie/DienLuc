@@ -1,4 +1,4 @@
-﻿namespace DienLuc
+﻿namespace DienLuc.Services
 {
     public interface IEmailSender
     {

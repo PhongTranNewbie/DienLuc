@@ -1,0 +1,58 @@
+﻿@model IEnumerable<DienLuc.Models.ThongBao>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<h1>Danh sách thông báo</h1>
+
+<p>
+    <a asp-action="Create">Tạo thông báo</a>
+</p>
+<table class="table">
+    <thead>
+        <tr class="table-warning">
+
+            <th>
+                Ngày thông báo
+            </th>
+            <th>
+                Mã hóa đơn
+            </th>
+            <th>
+                Nội dung
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 0;
+            string @cls = "table-success";
+
+        }
+@foreach (var item in Model) {
+            i = i + 1;
+            cls = "table-success";
+            if (i % 2 == 0)
+            {
+                cls = "table-primary";
+            }
+        <tr class="@cls">
+
+            <td>
+
+                @Html.DisplayFor(modelItem => item.NgayThongBao)
+            </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaHdNavigation.MaHd)
+                </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NoiDung)
+            </td>
+
+        </tr>
+}
+    </tbody>
+</table>

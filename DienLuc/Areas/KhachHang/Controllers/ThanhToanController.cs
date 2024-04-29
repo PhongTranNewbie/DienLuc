@@ -74,10 +74,15 @@ namespace DienLuc.Controllers
                 return View(hoaDon);
 
             }
-			hoaDon.TrangThai = "Đã thanh toán";
+            if (hoaDon.SoTienDaThanhToan > hoaDon.SoTienCanThanhToan)
+            {
+                ModelState.AddModelError(string.Empty, "Bạn đã thanh toán vượt quá số tiền cần thanh toán");
+                return View(hoaDon);
 
+            }
+            hoaDon.TrangThai = "Đã thanh toán";
+            hoaDon.MaPtttoan = "PT1";
 			_context.SaveChanges();
-
 			return RedirectToAction(nameof(ThanhToanThanhCong));
 		}
         [HttpGet("danhsachhoadon")]
@@ -127,6 +132,7 @@ namespace DienLuc.Controllers
 					.ToList();
 
             PagedList<HoaDon> tdt = new PagedList<HoaDon> (dtt, pageNumber, pageSize);
+            ViewBag.DHD = _context.DongHoDiens.ToList();
 			return View(tdt);
 		}
 
@@ -144,7 +150,38 @@ namespace DienLuc.Controllers
                     .ToList();
 
             PagedList<HoaDon> tdt = new PagedList<HoaDon>(dtt, pageNumber, pageSize);
+            ViewBag.DHD = _context.DongHoDiens.ToList ();
             return View(tdt);
+        }
+
+        [HttpGet("DongHoDien")]
+        public IActionResult Filter(string maDh, int? page)
+        {
+            int pageSize = 12;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+
+
+            IQueryable<DongHoDien> ct = _context.DongHoDiens.Include(x => x.MaKhNavigation);
+
+            // Kiểm tra và lọc theo trạng thái nếu có giá trị truyền vào
+
+
+
+            // Kiểm tra và lọc theo mã khách hàng nếu có giá trị truyền vào
+            if (!string.IsNullOrEmpty(maDh))
+            {
+                ct = ct.Where(h => h.MaDh == maDh);
+            }
+
+            
+
+            // Chuyển IQueryable sang List
+            var filteredData = ct.AsNoTracking().OrderByDescending(x => x.MaDh).ToList();
+            PagedList<DongHoDien> mhd = new PagedList<DongHoDien>(filteredData, pageNumber, pageSize);
+            // Truyền danh sách đồng hồ điện và danh sách khách hàng vào ViewBag để sử dụng trong PartialView
+
+            // Trả về PartialView chứa danh sách hóa đơn đã lọc
+            return View("HDDaThanhToan", mhd);
         }
     }
 }

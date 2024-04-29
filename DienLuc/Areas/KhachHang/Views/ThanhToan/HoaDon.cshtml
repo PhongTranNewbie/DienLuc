@@ -7,10 +7,23 @@
 
     var dhd = ViewBag.DHD as List<DienLuc.Models.DongHoDien>;
 }
-
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="maDh">Mã đồng hồ:</label>
+            <select id="maDh" class="form-control">
+                <option value="">Tất cả</option>
+                @foreach (var dongHo in dhd)
+                {
+                    <option value="@dongHo.MaDh">@dongHo.MaDh</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
 <h1>Danh sách hóa đơn</h1>
 
-<table class="table">
+<table id="dhd" class="table">
     <thead>
         <tr class="table-warning">
             <th>
@@ -119,3 +132,33 @@
     LiElementClasses = new string[] { "page-item" },
     PageClasses = new string[] { "page-link" }
 })
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $('#maDh').change(function () {
+
+                var maDh = $('#maDh').val();
+
+
+                $.ajax({
+                    url: '/admin/thanhtoan/DongHoDien',
+                    type: 'GET',
+                    data: { maDh: maDh },
+                    success: function (result) {
+                        $('#dhd tbody').html($(result).find('tbody').html());
+                        // Cập nhật phân trang nếu cần
+                        $('#paginationContainer').html($(result).find('#paginationContainer').html());
+                    },
+                    error: function () {
+                        console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
+                    }
+                });
+            });
+        });
+
+    </script>
+}

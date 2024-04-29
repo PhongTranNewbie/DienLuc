@@ -108,5 +108,16 @@ namespace Dienluc.Areas.Admin.Controllers
             PagedList<NhanVien> nv = new PagedList<NhanVien>(lnv, pageNumber, pageSize);
             return View(nv);
         }
+
+        [HttpGet("DanhSachKH")]
+        public IActionResult DanhSachKH(int? page)
+        {
+            int pageSize = 12;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+            var lnv = _db.KhachHangs.AsNoTracking().OrderByDescending(x => x.MaKh).Include(c => c.MatkNavigation);
+
+            PagedList<KhachHang> kh = new PagedList<KhachHang>(lnv, pageNumber, pageSize);
+            return View(kh);
+        }
     }
 }

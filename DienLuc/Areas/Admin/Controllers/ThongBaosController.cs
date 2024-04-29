@@ -7,10 +7,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DienLuc.Models;
 using DienLuc.Services;
+using X.PagedList;
 
-
-namespace DienLuc.Controllers
+namespace DienLuc.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+    [Route("Admin")]
+    [Route("Admin/ThongBao")]
     public class ThongBaosController : Controller
     {
         private readonly DienLucContext _context;
@@ -22,12 +25,9 @@ namespace DienLuc.Controllers
             _emailSender = emailSender;
         }
 
-        public ThongBaosController(DienLucContext context)
-        {
-            _context = context;
-        }
-
         // GET: ThongBaos
+        [HttpGet("")]
+        [HttpGet("DanhSachThongBao")]
         public async Task<IActionResult> Index()
         {
             var dienLucContext = _context.ThongBaos.Include(t => t.MaHdNavigation);
@@ -35,6 +35,7 @@ namespace DienLuc.Controllers
         }
 
         // GET: ThongBaos/Details/5
+        [HttpGet("ChiTietThongBao")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -54,6 +55,7 @@ namespace DienLuc.Controllers
         }
 
         // GET: ThongBaos/Create
+        [HttpGet("GuiThongBao")]
         public IActionResult Create()
         {
             ViewData["MaHd"] = new SelectList(_context.HoaDons, "MaHd", "MaHd");
@@ -63,19 +65,19 @@ namespace DienLuc.Controllers
         // POST: ThongBaos/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost("GuiThongBao")]
         [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> Create([Bind("Id,MaHd,NgayThongBao,NoiDung")] ThongBao thongBao)
+        public async Task<IActionResult> Create([Bind("Id,MaHd,NgayThongBao,NoiDung,NgayHetHan")] ThongBao thongBao)
         {
             if (ModelState.IsValid)
             {
+                thongBao.NgayThongBao = DateOnly.FromDateTime(DateTime.UtcNow);
                 _context.Add(thongBao);
                 await _context.SaveChangesAsync();
 
                 // Gửi email
-                var email = _context.HoaDons.
-                    Where(x => x.MaHd == thongBao.MaHd)
+                var email = _context.HoaDons
+                    .Where(x => x.MaHd == thongBao.MaHd)
                     .Include(x => x.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation)
                     .Select(x => x.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation.Email)
                     .FirstOrDefault();
@@ -87,6 +89,12 @@ namespace DienLuc.Controllers
             return View(thongBao);
         }
 
+        [HttpGet("NgayHienTai")]
+        public IActionResult Date(string id)
+        {
+            var NgayThongBao = DateOnly.FromDateTime(DateTime.UtcNow);
+            return Json(new { NgayThongBao = NgayThongBao });
+        }
         private bool ThongBaoExists(int id)
         {
             return _context.ThongBaos.Any(e => e.Id == id);

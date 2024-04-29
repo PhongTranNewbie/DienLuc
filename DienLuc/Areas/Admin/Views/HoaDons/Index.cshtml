@@ -5,16 +5,52 @@
     ViewData["Title"] = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 
-    var dhd = ViewBag.DHD as List<DienLuc.Models.DongHoDien>;
+    var dongHoDienList = ViewBag.DHD as List<DienLuc.Models.DongHoDien>;
+    var khachHangList = ViewBag.KhachHangList as List<DienLuc.Models.KhachHang>;
 }
-
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="trangThai">Trạng thái:</label>
+            <select id="trangThai" class="form-control">
+                <option value="">Tất cả</option>
+                <option value="Đã thanh toán">Đã thanh toán</option>
+                <option value="Chưa thanh toán">Chưa thanh toán</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="maDh">Mã đồng hồ:</label>
+            <select id="maDh" class="form-control">
+                <option value="">Tất cả</option>
+                @foreach (var dongHo in dongHoDienList)
+                {
+                    <option value="@dongHo.MaDh">@dongHo.MaDh</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="maKh">Mã khách hàng:</label>
+            <select id="maKh" class="form-control">
+                <option value="">Tất cả</option>
+                @foreach (var khachHang in khachHangList)
+                {
+                    <option value="@khachHang.MaKh">@khachHang.MaKh</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
 <h1>Danh sách hóa đơn</h1>
 
 <p>
     <a class="btn btn-primary" asp-action="Create">Thêm mới</a>
 </p>
 
-<table class="table">
+<table id="hoaDonTable" class="table">
     <thead>
         <tr class="table-warning">
             <th>
@@ -35,12 +71,23 @@
             <th>
                 Chỉ số mới
             </th>
-
+            <th>
+                Chỉ số tiêu thụ
+            </th>
+            <th>
+                Thuế
+            </th>
+            <th>
+                Số nợ
+            </th>
             <th>
                 Số tiền cần thanh toán
             </th>
             <th>
                 Số tiền đã thanh toán
+            </th>
+            <th>
+                Phương pháp thanh toán
             </th>
             <th>
                 Mã đồng hồ
@@ -55,9 +102,11 @@
         </tr>
     </thead>
     <tbody>
+
         @{
             int i = 0;
             string @cls = "table-success";
+
         }
         @foreach (var item in Model)
         {
@@ -87,12 +136,27 @@
                     @Html.DisplayFor(modelItem => item.ChiSoMoi)
                 </td>
                 <td>
+                    @(item.ChiSoMoi - item.ChiSoCu)
+                </td>
+                <td>
+                    @if (i < ViewBag.ListThue.Count) // Kiểm tra chỉ mục trước khi truy cập
+                    {
+                        
+                        @string.Format("{0:N0}", ViewBag.ListThue[i])
+                    }
+                </td>
+                <td>
+                    @string.Format("{0:N0}", item.SoNo)
+                </td>
+                <td>
                     @string.Format("{0:N0}", item.SoTienCanThanhToan)
                 </td>
                 <td>
                     @string.Format("{0:N0}", item.SoTienDaThanhToan)
                 </td>
-
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaPtttoanNavigation.PhuongPhapTt)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.MaChiTietSddienNavigation.MaDh)
                 </td>
@@ -101,7 +165,7 @@
                 </td>
                 <td>
                        
-                            @Html.DisplayFor(modelItem => item.MaChiTietSddienNavigation.MaDhNavigation.MaKh)
+                    @Html.DisplayFor(modelItem => item.MaChiTietSddienNavigation.MaDhNavigation.MaKh)
                         
                 </td>
 
@@ -121,3 +185,36 @@
     LiElementClasses = new string[] { "page-item" },
     PageClasses = new string[] { "page-link" }
 })
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $('#trangThai, #maDh, #maKh').change(function () {
+                var trangThai = $('#trangThai').val();
+                var maDh = $('#maDh').val();
+                var maKh = $('#maKh').val();
+
+                $.ajax({
+                    url: '/admin/HoaDon/LocTheo',
+                    type: 'GET',
+                    data: { trangThai: trangThai, maDh: maDh, maKh: maKh },
+                    success: function (result) {
+                        $('#hoaDonTable tbody').html($(result).find('tbody').html());
+                        // Cập nhật phân trang nếu cần
+                        $('#paginationContainer').html($(result).find('#paginationContainer').html());
+                    },
+                    error: function () {
+                        console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
+                    }
+                });
+            });
+        });
+
+    </script>
+}
+
+

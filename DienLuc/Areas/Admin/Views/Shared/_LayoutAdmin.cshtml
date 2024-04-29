@@ -3,24 +3,33 @@
 
 <html lang="en">
 <head>
+    
+        <link href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css'
+              rel='stylesheet'>
 
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Purple Admin</title>
-    <!-- plugins:css -->
-    <link rel="stylesheet" href="~/LayoutAdmin/assets/vendors/mdi/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="~/LayoutAdmin/assets/vendors/css/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <!-- endinject -->
-    <!-- Layout styles -->
-    <link rel="stylesheet" href="~/LayoutAdmin/assets/css/style.css">
-    <!-- End layout styles -->
-    <link rel="shortcut icon" href="~/LayoutAdmin/assets/images/favicon.ico" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Purple Admin</title>
+        <!-- plugins:css -->
+        <link rel="stylesheet" href="~/LayoutAdmin/assets/vendors/mdi/css/materialdesignicons.min.css">
+        <link rel="stylesheet" href="~/LayoutAdmin/assets/vendors/css/vendor.bundle.base.css">
+        <!-- endinject -->
+        <!-- Plugin css for this page -->
+        <!-- End plugin css for this page -->
+        <!-- inject:css -->
+        <!-- endinject -->
+        <!-- Layout styles -->
+        <link rel="stylesheet" href="~/LayoutAdmin/assets/css/style.css">
+        <!-- End layout styles -->
+        <link rel="shortcut icon" href="~/LayoutAdmin/assets/images/favicon.ico" />
+
 </head>
+
 <body>
 
     <!-- partial:partials/_navbar.html -->
@@ -94,7 +103,7 @@
             <ul class="nav">
                 
                 <li class="nav-item">
-                    <a class="nav-link" href="/admin/danhsachhoadon">
+                    <a class="nav-link" href="/admin/Trangchu">
                         <span class="menu-title">Trang chủ</span>
                         <i class="mdi mdi-home menu-icon"></i>
                     </a>
@@ -128,18 +137,7 @@
                             </ul>
                         </div>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/DanhSachLoaiTK">
-                            <span class="menu-title">Danh sách loại tài khoản</span>
-                            <i class="mdi mdi-chart-bar menu-icon"></i>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/DanhSachVaiTro">
-                            <span class="menu-title">Danh sách vai trò</span>
-                            <i class="mdi mdi-chart-bar menu-icon"></i>
-                        </a>
-                    </li>
+                    
                 }
                 <li class="nav-item">
                     <a class="nav-link" href="/admin/danhsachhoadon">
@@ -149,12 +147,17 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link" href="/admin/taikhoan/ThongTinNV">
-                        <span class="menu-title">Thông tin</span>
+                    <a class="nav-link" href="/admin/taikhoanad/DanhSachKH">
+                        <span class="menu-title">Danh sách khách hàng</span>
                         <i class="mdi mdi-format-list-bulleted menu-icon"></i>
                     </a>
                 </li>
-                
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/thongbao/danhsachthongbao">
+                        <span class="menu-title">Thông báo</span>
+                        <i class="mdi mdi-format-list-bulleted menu-icon"></i>
+                    </a>
+                </li>
                 
             </ul>
         </nav>

@@ -59,9 +59,11 @@ namespace DienLuc.Areas.KhachHang.Controllers
 
                         return RedirectToAction("Index", "DongHo");
                     }
+                    
                 }
             }
-            
+            ModelState.AddModelError(string.Empty, "Sai tài khoản hoặc mật khẩu.");
+
             return View(taikhoan);
         }
 

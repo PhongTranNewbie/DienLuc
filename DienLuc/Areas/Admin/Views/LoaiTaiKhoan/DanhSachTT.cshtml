@@ -1,0 +1,48 @@
+﻿@model IEnumerable<DienLuc.Models.PhuongThucThanhToan>
+
+@{
+    ViewData["Title"] = "Loai tai khoan";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<h1>Danh sách loại phương thức thanh toán</h1>
+<p>
+    <a class="btn btn-primary" asp-action="PTTT">Thêm mới</a>
+</p>
+<table class="table">
+    <thead>
+        <tr class="table-warning">
+            <th>
+                Mã phương thức
+            </th>
+            <th>
+                Tên loại phương thức
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 0;
+            string @cls = "table-success";
+        }
+        @foreach (var item in Model)
+        {
+            i = i + 1;
+            cls = "table-success";
+            if (i % 2 == 0)
+            {
+                cls = "table-primary";
+            }
+            <tr class="@cls">
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaPttt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PhuongPhapTt)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

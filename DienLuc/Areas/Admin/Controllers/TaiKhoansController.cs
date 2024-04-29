@@ -51,6 +51,8 @@ namespace DienLuc.Areas.Admin.Controllers
             {
                 if(Check(viewModel))
                 {
+                    ViewData["VaiTro"] = new SelectList(_context.VaiTros, "MaVaiTro", "ViTri");
+
                     return View(viewModel);
                 }
 
@@ -66,7 +68,20 @@ namespace DienLuc.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
                 // Tạo mã khách hàng mới
                 var maxMaNv = await _context.NhanViens.MaxAsync(kh => kh.MaNv);
-                var newMaNv = "NV" + (int.Parse(maxMaNv.Replace("NV", "")) + 1);
+                string newMaNv;
+
+                // Kiểm tra xem maxMaKh có giá trị null không
+                if (maxMaNv == null)
+                {
+                    // Nếu maxMaKh là null, gán mã khách hàng đầu tiên là "KH1"
+                    newMaNv = "NV1";
+                }
+                else
+                {
+                    // Nếu maxMaKh không phải null, tăng mã khách hàng lên một đơn vị và sử dụng nó cho mã khách hàng mới
+                    int nextMaKhNumber = int.Parse(maxMaNv.Replace("NV", "")) + 1;
+                    newMaNv = "NV" + nextMaKhNumber;
+                }
                 // Tạo đối tượng Nhân viên mới
                 var newNhanVien = new NhanVien
                 {
@@ -85,10 +100,11 @@ namespace DienLuc.Areas.Admin.Controllers
                 // Thêm nhân viên mới vào context và lưu vào cơ sở dữ liệu
                 _context.NhanViens.Add(newNhanVien);
                 await _context.SaveChangesAsync();
-
+                TempData["successMessage"] = "Đã tạo nhân viên thành công";
                 return RedirectToAction("Index", "DongHoDiens");
             }
             ViewData["VaiTro"] = new SelectList(_context.VaiTros, "MaVaiTro", "ViTri");
+            TempData["errorMessage"] = "Đã tạo nhân viên thất bại";
             return View(viewModel);
         }
         public bool Check(TaiKhoanVaThongTinNVViewModel viewModel)

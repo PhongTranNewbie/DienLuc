@@ -6,20 +6,44 @@
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 
 }
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="trangThai">Trạng thái:</label>
+            <select id="trangThai" class="form-control">
+                <option value="">Tất cả</option>
+                <option value="Đang hoạt động">Đang hoạt động</option>
+                <option value="Đã tạm dừng hoạt động">Đã tạm dừng hoạt động</option>
+                <option value="Đã hủy sử dụng dịch vụ">Đã hủy sử dụng dịch vụ</option>
+
+            </select>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="LoaiDhd">Loại đồng hồ:</label>
+            <select id="LoaiDhd" class="form-control">
+                <option value="">Tất cả</option>
+                <option value="Điện tử">Điện tử</option>
+                <option value="Đĩa xoay">Đĩa xoay</option>
+            </select>
+        </div>
+    </div>
+</div>
 
 <h1>Danh sách đồng hồ</h1>
 
 <p>
     <a class="btn btn-primary" asp-action="Create">Tạo mới</a>
 </p>
-<table class="table">
+<table id="dh" class="table">
     <thead>
         <tr class="table-warning">
             <th>
                 Mã đồng hồ
             </th>
             <th>
-                Mã khách hàng
+                Tên khách hàng
             </th>
             <th>
                 Trạng thái
@@ -50,9 +74,9 @@
                     @Html.DisplayFor(modelItem => item.MaDh)
 
             </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MaKh)
-                </td>
+
+                <td>@item.MaKhNavigation.Ho @item.MaKhNavigation.Ten</td>
+                
             <td>
                 @Html.DisplayFor(modelItem => item.TrangThai)
             </td>
@@ -77,3 +101,32 @@
     LiElementClasses = new string[] { "page-item" },
     PageClasses = new string[] { "page-link" }
 })
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $('#trangThai, #LoaiDhd').change(function () {
+                var trangThai = $('#trangThai').val();
+                var LoaiDhd = $('#LoaiDhd').val();
+
+                $.ajax({
+                    url: '/admin/dongho/DongHoDien',
+                    type: 'GET',
+                    data: { trangThai: trangThai, LoaiDhd: LoaiDhd },
+                    success: function (result) {
+                        $('#dh tbody').html($(result).find('tbody').html());
+                        // Cập nhật phân trang nếu cần
+                        $('#paginationContainer').html($(result).find('#paginationContainer').html());
+                    },
+                    error: function () {
+                        console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
+                    }
+                });
+            });
+        });
+
+    </script>
+}

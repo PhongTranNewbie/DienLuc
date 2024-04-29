@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DienLuc.Models;
 using X.PagedList;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DienLuc.Areas.Admin.Controllers
 {
@@ -27,9 +28,8 @@ namespace DienLuc.Areas.Admin.Controllers
         {
             int pageSize = 12;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
-            var dongHoDiens = _context.DongHoDiens.AsNoTracking().OrderByDescending(x => x.MaDh);
+            var dongHoDiens = _context.DongHoDiens.Include(x => x.MaKhNavigation).AsNoTracking().OrderByDescending(x => x.MaDh);
             PagedList<DongHoDien> dhd = new PagedList<DongHoDien>(dongHoDiens, pageNumber, pageSize);
-
             return View(dhd);
         }
 
@@ -86,9 +86,12 @@ namespace DienLuc.Areas.Admin.Controllers
                 // Thêm đồng hồ vào cơ sở dữ liệu
                 _context.Add(dongHoDien);
                 await _context.SaveChangesAsync();
+                TempData["successMessage"] = "Đã tạo đồng hồ điện thành công";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["MaKh"] = new SelectList(_context.KhachHangs, "MaKh", "MaKh", dongHoDien.MaKh);
+            TempData["errorMessage"] = "Đã tạo đồng hồ điện thất bại";
+
             return View(dongHoDien);
         }
 
@@ -129,6 +132,7 @@ namespace DienLuc.Areas.Admin.Controllers
                 {
                     _context.Update(dongHoDien);
                     await _context.SaveChangesAsync();
+                    TempData["successMessage"] = "Đã chỉnh sửa đồng hồ điện thành công";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -144,6 +148,8 @@ namespace DienLuc.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["MaKh"] = new SelectList(_context.KhachHangs, "MaKh", "MaKh", dongHoDien.MaKh);
+            TempData["errorMessage"] = "Đã chỉnh sửa đồng hồ điện thất bại";
+
             return View(dongHoDien);
         }
 
@@ -184,7 +190,9 @@ namespace DienLuc.Areas.Admin.Controllers
             {
                 _context.DongHoDiens.Remove(dongHoDien);
                 await _context.SaveChangesAsync();
+                TempData["successMessage"] = "Đã xóa đồng hồ điện thành công";
             }
+            TempData["errorMessage"] = "Đã xóa đồng hồ điện thất bại";
 
             return RedirectToAction(nameof(Index));
         }
@@ -192,6 +200,40 @@ namespace DienLuc.Areas.Admin.Controllers
         private bool DongHoDienExists(string id)
         {
             return _context.DongHoDiens.Any(e => e.MaDh == id);
+        }
+
+        [HttpGet("DongHoDien")]
+        public IActionResult Filter(string trangThai, string LoaiDhd, int? page)
+        {
+            int pageSize = 12;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+
+
+            IQueryable<DongHoDien> ct = _context.DongHoDiens.Include(x => x.MaKhNavigation);
+
+            // Kiểm tra và lọc theo trạng thái nếu có giá trị truyền vào
+
+
+
+            // Kiểm tra và lọc theo mã khách hàng nếu có giá trị truyền vào
+            if (!string.IsNullOrEmpty(trangThai))
+            {
+                ct = ct.Where(h => h.TrangThai == trangThai);
+            }
+
+            // Kiểm tra và lọc theo mã khách hàng nếu có giá trị truyền vào
+            if (!string.IsNullOrEmpty(LoaiDhd))
+            {
+                ct = ct.Where(h => h.LoaiDhd == LoaiDhd);
+            }
+
+            // Chuyển IQueryable sang List
+            var filteredData = ct.AsNoTracking().OrderByDescending(x => x.MaDh).ToList();
+            PagedList<DongHoDien> mhd = new PagedList<DongHoDien>(filteredData, pageNumber, pageSize);
+            // Truyền danh sách đồng hồ điện và danh sách khách hàng vào ViewBag để sử dụng trong PartialView
+
+            // Trả về PartialView chứa danh sách hóa đơn đã lọc
+            return View("Index", mhd);
         }
     }
 }

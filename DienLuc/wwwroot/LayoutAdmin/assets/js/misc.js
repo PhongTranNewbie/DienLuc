@@ -111,7 +111,11 @@ var lightColor = getComputedStyle(document.body).getPropertyValue('--light');
       }
     })
     if ($.cookie('purple-free-banner')!="true") {
-      document.querySelector('#proBanner').classList.add('d-flex');
+        var proBanner = document.querySelector('#proBanner');
+        if (proBanner !== null) {
+            proBanner.classList.add('d-flex');
+        }
+
       document.querySelector('.navbar').classList.remove('fixed-top');
     }
     else {

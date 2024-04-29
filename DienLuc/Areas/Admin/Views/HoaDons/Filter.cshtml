@@ -1,0 +1,191 @@
+﻿@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<HoaDon>
+
+@{
+    ViewData["Title"] = "Filter";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+    var dongHoDienList = ViewBag.DHD as List<DienLuc.Models.DongHoDien>;
+    var khachHangList = ViewBag.KhachHangList as List<DienLuc.Models.KhachHang>;
+}
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="trangThai">Trạng thái:</label>
+            <select id="trangThai" class="form-control">
+                <option value="">Tất cả</option>
+                <option value="Đã thanh toán">Đã thanh toán</option>
+                <option value="Chưa thanh toán">Chưa thanh toán</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="maDh">Mã đồng hồ:</label>
+            <select id="maDh" class="form-control">
+                <option value="">Tất cả</option>
+                @foreach (var dongHo in dongHoDienList)
+                {
+                    <option value="@dongHo.MaDh">@dongHo.MaDh</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="maKh">Mã khách hàng:</label>
+            <select id="maKh" class="form-control">
+                <option value="">Tất cả</option>
+                @foreach (var khachHang in khachHangList)
+                {
+                    <option value="@khachHang.MaKh">@khachHang.MaKh</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+<h1>Danh sách hóa đơn</h1>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Thêm mới</a>
+</p>
+
+<table id="hoaDonTable" class="table">
+    <thead>
+        <tr class="table-warning">
+            <th>
+                Mã hóa đơn
+            </th>
+            <th>
+                Ngày tạo
+            </th>
+            <th>
+                Ngày đến hạn
+            </th>
+            <th>
+                Ngày thanh toán
+            </th>
+            <th>
+                Chỉ số cũ
+            </th>
+            <th>
+                Chỉ số mới
+            </th>
+
+            <th>
+                Số tiền cần thanh toán
+            </th>
+            <th>
+                Số tiền đã thanh toán
+            </th>
+            <th>
+                Mã đồng hồ
+            </th>
+            <th>
+                Trạng thái
+            </th>
+            <th>
+                Mã khách hàng
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @{
+            int i = 0;
+            string @cls = "table-success";
+
+        }
+        @foreach (var item in Model)
+        {
+            i = i + 1;
+            cls = "table-success";
+            if (i % 2 == 0)
+            {
+                cls = "table-primary";
+            }
+            <tr class="@cls">
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaHd)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NgayTao)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NgayDenHan)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NgayThanhToan)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ChiSoCu)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ChiSoMoi)
+                </td>
+                <td>
+                    @string.Format("{0:N0}", item.SoTienCanThanhToan)
+                </td>
+                <td>
+                    @string.Format("{0:N0}", item.SoTienDaThanhToan)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaChiTietSddienNavigation.MaDh)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TrangThai)
+                </td>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.MaChiTietSddienNavigation.MaDhNavigation.MaKh)
+
+                </td>
+
+
+
+                <td>
+                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.MaHd">Chỉnh sửa</a> |
+                    <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.MaHd">Chi tiết</a> |
+                    <a class="btn btn-primary" asp-action="Delete" asp-route-id="@item.MaHd">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+{
+    LiElementClasses = new string[] { "page-item" },
+    PageClasses = new string[] { "page-link" }
+})
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $('#trangThai, #maDh, #maKh').change(function () {
+                var trangThai = $('#trangThai').val();
+                var maDh = $('#maDh').val();
+                var maKh = $('#maKh').val();
+
+                $.ajax({
+                    url: '/admin/HoaDon/LocTheo',
+                    type: 'GET', // Thay đổi thành yêu cầu GET
+                    data: { trangThai: trangThai, maDh: maDh, maKh: maKh },
+                    success: function (result) {
+                        $('#hoaDonTable').html(result);
+                    }
+
+                });
+
+
+            });
+        });
+    </script>
+}
+
+

@@ -3,4 +3,20 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Hello admin</h1>
+Date:
+<input type="text" id="my_date_picker">
+
+
+<script>
+    // Avoiding conflicts with other libraries
+    jQuery(document).ready(function ($) {
+        // Debugging: Check if jQuery is loaded and the selector works
+        console.log("jQuery loaded successfully.");
+        console.log($('#my_date_picker')); // Check if this selector returns the correct element
+
+        // Initialize Datepicker
+        $('#my_date_picker').datepicker();
+    });
+</script>
+
+

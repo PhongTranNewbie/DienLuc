@@ -17,7 +17,7 @@ public partial class HoaDon
 
     public DateTime? NgayThanhToan { get; set; }
 
-    public decimal SoNo = 0; 
+    public decimal SoNo = 0;
 
     public decimal SoTienCanThanhToan { get; set; }
 

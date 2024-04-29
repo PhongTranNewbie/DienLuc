@@ -1,0 +1,51 @@
+﻿@model DienLuc.Models.ThongBao
+
+@{
+    ViewData["Title"] = "ThongBao";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+<div class="page-header">
+    <nav style="--cui-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Danh sách thông báo</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Gửi thông báo</li>
+        </ol>
+    </nav>
+</div>
+
+<hr />
+<div class="row">
+    <h1>Tạo thông báo</h1>
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="MaHd" class="control-label">Mã hóa đơn</label>
+                <select asp-for="MaHd" class="form-control" asp-items="ViewBag.MaHd"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="NoiDung" class="control-label">Nội dung</label>
+                <input asp-for="NoiDung" class="form-control" />
+                <span asp-validation-for="NoiDung" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NgayHetHan" class="control-label">Ngày hết hạn</label>
+                <input asp-for="NgayHetHan" class="form-control" type="date"/>
+                <span asp-validation-for="NgayHetHan" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Gửi thông báo" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

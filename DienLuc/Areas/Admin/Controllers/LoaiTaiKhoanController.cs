@@ -107,5 +107,50 @@ namespace DienLuc.Areas.Admin.Controllers
             return View(ltk);
         }
 
+        [HttpGet("DanhSachPT")]
+        public IActionResult DanhSachTT()
+        {
+            var role = _context.PhuongThucThanhToans.ToList();
+            return View(role);
+        }
+        [HttpGet("ThemPTTT")]
+        public IActionResult PTTT()
+        {
+            /*var userid = HttpContext.Session.GetString("MaTk");
+            if (userid == null)
+            {
+                return NotFound();
+            }*/
+            return View();
+        }
+        [HttpPost("ThemPTTT")]
+        [ValidateAntiForgeryToken]
+        public IActionResult PTTT(PhuongThucThanhToan ltk)
+        {
+            if (ModelState.IsValid)
+            {
+                var existingMaLoaiTk = _context.PhuongThucThanhToans.FirstOrDefault(x => x.MaPttt == ltk.MaPttt);
+                var existingTenLoaiTk = _context.PhuongThucThanhToans.FirstOrDefault(x => x.PhuongPhapTt == ltk.PhuongPhapTt);
+
+                if (existingMaLoaiTk != null)
+                {
+                    ModelState.AddModelError(string.Empty, "Mã phương thức thanh toán này đã tồn tại.");
+                }
+                else if (existingTenLoaiTk != null)
+                {
+                    ModelState.AddModelError(string.Empty, "Phương thức thanh toán này đã tồn tại.");
+                }
+                else
+                {
+                    _context.Add(ltk);
+                    _context.SaveChanges();
+                    TempData["successMessage"] = "Đã tạo phương thức thanh toán thành công";
+                    return RedirectToAction("DanhSachTT");
+                }
+            }
+
+            return View(ltk);
+        }
+
     }
 }

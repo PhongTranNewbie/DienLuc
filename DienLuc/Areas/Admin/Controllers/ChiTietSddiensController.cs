@@ -31,7 +31,8 @@ namespace DienLuc.Areas.Admin.Controllers
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var ctdh = _context.ChiTietSddiens.AsNoTracking().OrderByDescending(x => x.Id).Include(c => c.MaDhNavigation).Include(c => c.MaNvNavigation);
             PagedList<ChiTietSddien> ct = new PagedList<ChiTietSddien>(ctdh, pageNumber, pageSize);
-
+            ViewBag.DHD = _context.DongHoDiens.ToList();
+            ViewBag.khachHangList = _context.KhachHangs.ToList();
             return View(ct);
 
         }
@@ -123,12 +124,15 @@ namespace DienLuc.Areas.Admin.Controllers
             {
                 ModelState.AddModelError(string.Empty, $"Chỉ số điện không được bé hơn chi số điện tháng trước là {lastestCsd}.");
                 // Trả về view với model để hiển thị thông báo lỗi cho người dùng
+                ViewData["MaDh"] = new SelectList(_context.DongHoDiens, "MaDh", "MaDh");
+                ViewData["MaNv"] = new SelectList(_context.NhanViens, "MaNv", "MaNv");
                 return View(chiTietSddien);
             }
             var n = _context.NhanViens.FirstOrDefault(x => x.Matk == userId);
             chiTietSddien.MaNv = n.MaNv;
             _context.Add(chiTietSddien);
             await _context.SaveChangesAsync();
+            TempData["successMessage"] = "Đã tạo chi tiết sử dụng điện thành công";
             return RedirectToAction(nameof(Index));
 
         }
@@ -185,6 +189,7 @@ namespace DienLuc.Areas.Admin.Controllers
 
                     _context.Update(chiTietSddien);
                     await _context.SaveChangesAsync();
+                    TempData["successMessage"] = "Đã chỉnh sửa chi tiết sử dụng điện thành công";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -201,6 +206,7 @@ namespace DienLuc.Areas.Admin.Controllers
             }
             ViewData["MaDh"] = new SelectList(_context.DongHoDiens, "MaDh", "MaDh", chiTietSddien.MaDh);
             ViewData["MaNv"] = new SelectList(_context.NhanViens, "MaNv", "MaNv", chiTietSddien.MaNv);
+            TempData["errorMessage"] = "Đã chỉnh sửa chi tiết sử dụng điện thất bại";
             return View(chiTietSddien);
         }
 
@@ -251,15 +257,68 @@ namespace DienLuc.Areas.Admin.Controllers
                 }
 
                 await _context.SaveChangesAsync();
+                TempData["successMessage"] = "Đã xóa chi tiết sử dụng điện thành công";
                 return RedirectToAction(nameof(Index));
             }
             ModelState.AddModelError(string.Empty, "Không thể xóa chi tiết sử dụng điện này vì đã được sử dụng để tạo hóa đơn.");
+            TempData["errorMessage"] = "Xóa chi tiết sử dụng điện thất bại";
             return RedirectToAction(nameof(Delete));
         }
 
         private bool ChiTietSddienExists(int id)
         {
             return _context.ChiTietSddiens.Any(e => e.Id == id);
+        }
+
+        [HttpGet("DongHo")]
+        public IActionResult Filter(string maKh, int? page)
+        {
+            int pageSize = 12;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+
+
+            IQueryable<ChiTietSddien> ct = _context.ChiTietSddiens.Include(h => h.MaDhNavigation.MaKhNavigation);
+
+            // Kiểm tra và lọc theo trạng thái nếu có giá trị truyền vào
+            
+
+            
+            // Kiểm tra và lọc theo mã khách hàng nếu có giá trị truyền vào
+            if (!string.IsNullOrEmpty(maKh))
+            {
+                ct = ct.Where(h => h.MaDhNavigation.MaKh == maKh);
+            }
+
+
+            // Chuyển IQueryable sang List
+            var filteredData = ct.AsNoTracking().OrderByDescending(x => x.Id).ToList();
+            PagedList<ChiTietSddien> mhd = new PagedList<ChiTietSddien>(filteredData, pageNumber, pageSize);
+            // Truyền danh sách đồng hồ điện và danh sách khách hàng vào ViewBag để sử dụng trong PartialView
+            ViewBag.DHD = _context.DongHoDiens.ToList();
+            ViewBag.khachHangList = _context.KhachHangs.ToList();
+
+            // Trả về PartialView chứa danh sách hóa đơn đã lọc
+            return View("Index", mhd);
+        }
+
+        [HttpGet("LayThongTinTheoNgay")]
+        public IActionResult LayThongTinTheoNgay(DateTime ngayLayThongTin, int? page)
+        {
+            int pageSize = 12;
+            int pageNumber = page ?? 1;
+
+            // Truy vấn cơ sở dữ liệu để lấy dữ liệu theo ngày lấy thông tin được chọn
+            var chiTietSdDienList = _context.ChiTietSddiens
+                .Where(x => x.NgayLayThongTin.Date == ngayLayThongTin.Date) // Lọc theo ngày lấy thông tin
+                .Include(x => x.MaDhNavigation)
+                .OrderByDescending(x => x.Id) // Sắp xếp theo ID hoặc một trường khác nếu cần
+                .ToList();
+
+            // Phân trang dữ liệu
+            var pagedList = chiTietSdDienList.ToPagedList(pageNumber, pageSize);
+
+            // Trả về view với dữ liệu đã lọc và phân trang
+            return View("Index", pagedList);
         }
     }
 }

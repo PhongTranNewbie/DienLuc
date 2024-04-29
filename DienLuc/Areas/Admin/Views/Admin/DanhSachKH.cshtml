@@ -1,0 +1,54 @@
+﻿@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<KhachHang>
+
+@{
+    ViewData["Title"] = "Danh sách khách hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table">
+    <thead>
+        <tr class="table-warning">
+            <th>Mã khách hàng</th>
+            <th>CCCD</th>
+            <th>Họ và tên</th>
+            <th>Ngày sinh</th>
+            <th>Địa chỉ</th>
+            <th>Số điện thoại</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int i = 0;
+            string @cls = "table-success";
+        }
+        @foreach (var item in Model)
+        {
+            i = i + 1;
+            cls = "table-success";
+            if (i % 2 == 0)
+            {
+                cls = "table-primary";
+            }
+            <tr class="@cls">
+                <td>@item.MaKh</td>
+                <td>@item.Cccd</td>
+                <td>@item.Ho @item.Ten</td>
+                <td>@item.NgaySinh.ToShortDateString()</td>
+                <td>@item.DiaChi</td>
+                <td>@item.SoDt</td>
+                <td>@item.Email</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+{
+    LiElementClasses = new string[] { "page-item" },
+    PageClasses = new string[] { "page-link" }
+})

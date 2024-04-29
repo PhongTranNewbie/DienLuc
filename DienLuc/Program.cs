@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using DienLuc;
+using DienLuc.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +24,8 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddScoped<IThongBaoService, ThongBaoService>();
+builder.Services.AddHostedService<DailyCheckService>();
 // Add email configuration and email sender service
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
