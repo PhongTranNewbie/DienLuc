@@ -1,0 +1,45 @@
+﻿@{
+    Layout = "~/Areas/KhachHang/Views/Shared/_LayoutKH.cshtml";
+    ViewData["Title"] = "Công cụ tính hóa đơn tiền điện";
+}
+
+<h2>Công cụ tính hóa đơn tiền điện</h2>
+<form method="post" action="@Url.Action("TienDien", "GiaTien")">
+    <div class="form-group">
+        <label for="chisotieuthu">Chỉ số tiêu thụ điện (kWh): </label>
+        <input type="text" class="form-control" id="chisotieuthu" name="chisotieuthu" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Tính</button>
+    </div>
+</form>
+
+@if (ViewBag.SoTien != null)
+{
+    <h3>Kết quả</h3>
+    <div class="result">
+        <p>Số điện sử dụng: @ViewBag.Chisotieuthu kWh</p>
+        <p>Bảng giá tiền điện:</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Bậc thang</th>
+                    <th>Giá tiền điện (đồng/kWh)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bac in ViewBag.Bacs)
+                {
+                    <tr>
+                        <td>@bac.Min - @bac.Max</td>
+                        <td>@string.Format("{0:N0}", bac.Dongia)</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+        <p>Tiền điện chưa thuế: @string.Format("{0:N0}", ViewBag.SoTien) VND</p>
+        <p>Thuế GTGT (@ViewBag.Thue%) tiền điện: @string.Format("{0:N0}", ViewBag.ThueTien) VND</p>
+        <p>Tổng cộng tiền thanh toán (đồng): @string.Format("{0:N0}", ViewBag.TongTien) VND</p>
+    </div>
+}

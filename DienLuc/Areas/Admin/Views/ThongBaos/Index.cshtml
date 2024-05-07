@@ -19,6 +19,9 @@
                 Ngày thông báo
             </th>
             <th>
+                Ngày hết hạn
+            </th>
+            <th>
                 Mã hóa đơn
             </th>
             <th>
@@ -42,16 +45,17 @@
         <tr class="@cls">
 
             <td>
-
                 @Html.DisplayFor(modelItem => item.NgayThongBao)
             </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NgayHetHan)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.MaHdNavigation.MaHd)
                 </td>
             <td>
                 @Html.DisplayFor(modelItem => item.NoiDung)
             </td>
-
         </tr>
 }
     </tbody>

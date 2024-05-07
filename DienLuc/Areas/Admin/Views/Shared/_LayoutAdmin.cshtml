@@ -1,41 +1,70 @@
 ﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-    
-        <link href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css'
-              rel='stylesheet'>
+    <!-- Required meta tags -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-
-
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title>Purple Admin</title>
-        <!-- plugins:css -->
-        <link rel="stylesheet" href="~/LayoutAdmin/assets/vendors/mdi/css/materialdesignicons.min.css">
-        <link rel="stylesheet" href="~/LayoutAdmin/assets/vendors/css/vendor.bundle.base.css">
-        <!-- endinject -->
-        <!-- Plugin css for this page -->
-        <!-- End plugin css for this page -->
-        <!-- inject:css -->
-        <!-- endinject -->
-        <!-- Layout styles -->
-        <link rel="stylesheet" href="~/LayoutAdmin/assets/css/style.css">
-        <!-- End layout styles -->
-        <link rel="shortcut icon" href="~/LayoutAdmin/assets/images/favicon.ico" />
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Purple Admin</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="~/LayoutAdmin/assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="~/LayoutAdmin/assets/vendors/css/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="~/LayoutAdmin/assets/css/style.css">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="~/LayoutAdmin/assets/images/favicon.ico" />
+    <style>
+        .custom-bootstrap-icon {
+            display: inline-block;
+            font-family: bootstrap-icons !important;
+            font-style: normal;
+            font-weight: 400 !important;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1;
+            vertical-align: -.125em;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 1.125rem;
+            line-height: 1;
+            margin-left: auto;
+            color: #bba8bff5;
+        }
+        /* CSS để tùy chỉnh kiểu dáng của select box */
+        .custom-select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%23333" d="M10 12l-6-6H4l6 6 6-6h.001l-.001.002L16 6l-6 6z"/></svg>');
+            background-repeat: no-repeat;
+            background-position-x: calc(100% - 10px);
+            background-position-y: 50%;
+            padding-right: 2.25rem;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            padding-top: .375rem;
+            padding-bottom: .375rem;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+    </style>
 </head>
-
 <body>
 
     <!-- partial:partials/_navbar.html -->
-    <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+    <nav class="navbar default-layout-navbar mt-3 col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
         <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-            <a class="navbar-brand brand-logo" href="index.html"><img src="~/LayoutAdmin/assets/images/logo.svg" alt="logo" /></a>
+            <a class="navbar-brand brand-logo" href="index.html">
+                Điện lực
+            </a>
             <a class="navbar-brand brand-logo-mini" href="index.html"><img src="~/LayoutAdmin/assets/images/logo-mini.svg" alt="logo" /></a>
         </div>
         <div class="navbar-menu-wrapper d-flex align-items-stretch">
@@ -155,10 +184,17 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/admin/thongbao/danhsachthongbao">
                         <span class="menu-title">Thông báo</span>
-                        <i class="mdi mdi-format-list-bulleted menu-icon"></i>
+                        <i class="bi bi-bell custom-bootstrap-icon"></i>
                     </a>
+
                 </li>
-                
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/DoanhThu">
+                        <span class="menu-title">Doanh thu</span>
+                        <i class="bi bi-coin custom-bootstrap-icon"></i>
+                    </a>
+
+                </li>
             </ul>
         </nav>
         <!-- partial -->
@@ -199,7 +235,8 @@
         </div>
         <!-- main-panel ends -->
     </div>
-    <!-- page-body-wrapper ends -->
+        <!-- page-body-wrapper ends -->
+    
     <!-- container-scroller -->
     <!-- plugins:js -->
     <script src="~/LayoutAdmin/assets/vendors/js/vendor.bundle.base.js"></script>

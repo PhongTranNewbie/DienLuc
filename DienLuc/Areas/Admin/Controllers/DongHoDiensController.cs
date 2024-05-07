@@ -26,7 +26,7 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("Danhsachdongho")]
         public IActionResult Index(int? page)
         {
-            int pageSize = 12;
+            int pageSize = 2;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var dongHoDiens = _context.DongHoDiens.Include(x => x.MaKhNavigation).AsNoTracking().OrderByDescending(x => x.MaDh);
             PagedList<DongHoDien> dhd = new PagedList<DongHoDien>(dongHoDiens, pageNumber, pageSize);

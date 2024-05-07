@@ -9,20 +9,39 @@
 
 
 }
-<input type="text" id="datepicker" class="form-control">
 
-<h1>Danh mục cho chi tiết sử dụng điện</h1>
+<div class="row" style="border: 50px;">
+
+    <div class="col-md-3">
+        <div class="input-group">
+            <input type="text" id="my_date_picker" class="form-control" placeholder="Từ ngày">
+            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="input-group">
+            <input type="text" id="my_date_picker1" class="form-control" placeholder="Đến ngày">
+            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-primary" onclick="filterByDate(1)">Lọc</button>
+    </div>
+</div>
+
+
+<h1 class="mt-4">Danh mục cho chi tiết sử dụng điện</h1>
 
 <p>
     <a class="btn btn-primary" asp-action="Create">Tạo mới</a>
 </p>
-<table id ="ct" class="table">
+<table id="ct" class="table mt-4">
     <thead>
         <tr class="table-warning">
             <th>
                 Id
             </th>
-           
+
             <th>
                 Mã đồng hồ
             </th>
@@ -52,53 +71,124 @@
                 cls = "table-primary";
             }
             <tr class="@cls">
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-           
-            <td>
-                @Html.DisplayFor(modelItem => item.MaDhNavigation.MaDh)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaNv)
-            </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaDhNavigation.MaDh)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaNv)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ChiSoDien)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.NgayLayThongTin)
                 </td>
-            <td>
+                <td>
                     <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id">Chỉnh sửa</a> |
                     <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.Id">Xem chi tiết</a> |
                     <a class="btn btn-primary" asp-action="Delete" asp-route-id="@item.Id">Xóa</a>
-            </td>
-        </tr>
-}
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
-@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+<div id="paginationContainer">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
 {
     LiElementClasses = new string[] { "page-item" },
     PageClasses = new string[] { "page-link" }
 })
+</div>
 @section Scripts {
-    <link href="~/jquery-ui-1.13.3.custom/jquery-ui.theme.css" rel="stylesheet" />
-    <link href="~/jquery-ui-1.13.3.custom/jquery-ui.theme.min.css" rel="stylesheet" />
-    <link href="~/jquery-ui-1.13.3.custom/jquery-ui.structure.min.css" rel="stylesheet" />
-    <link href="~/jquery-ui-1.13.3.custom/jquery-ui.structure.css" rel="stylesheet" />
-    <link href="~/jquery-ui-1.13.3.custom/jquery-ui.css" rel="stylesheet" />
-    <link href="~/jquery-ui-1.13.3.custom/jquery-ui.min.css" rel="stylesheet" />
-    <script src="~/jquery-ui-1.13.3.custom/external/jquery/jquery.js"></script>
-    <script src="~/jquery-ui-1.13.3.custom/jquery-ui.js"></script>
-    <script src="~/jquery-ui-1.13.3.custom/jquery-ui.min.js"></script>
+    <link href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css'
+          rel='stylesheet'>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script>
-        $(document).ready(function () {
-            // Khởi tạo datepicker
-            $('#datepicker').datepicker();
+        // Define variables to store filter values
+        var fromDate = "";
+        var toDate = "";
+
+        // Function to update filter values
+        function updateFilterValues() {
+            fromDate = $('#my_date_picker').val();
+            toDate = $('#my_date_picker1').val();
+            // Update pagination links
+            updatePaginationLinks(1); // Assuming we reset to the first page after filter change
+        }
+
+
+        // Function to update pagination links
+        function updatePaginationLinks(pageNumber) {
+            // Update URL for pagination links including fromDate and toDate parameters
+            var url = '/admin/chitietsddien/LocChiTiet?page=' + pageNumber + '&fromDate=' + fromDate + '&toDate=' + toDate;
+            return url;
+        }
+
+        // Bind event handler for pagination links
+        $(document).on('click', '#paginationContainer a', function (e) {
+            e.preventDefault(); // Prevent default behavior of the pagination links
+            var pageUrl = $(this).attr('href');
+            $.get(pageUrl, function (data) {
+                // Update the table content and pagination links with the received data
+                $('#ct').html($(data).find('#ct').html());
+                $('#paginationContainer').html($(data).find('#paginationContainer').html());
+
+                // Update filter values based on the date pickers
+                updateFilterValues();
+
+                // Trigger filter function with the current page number
+                filterByDate(pageUrl.substring(pageUrl.indexOf('page=') + 5));
+            });
         });
+
+
+
+
+        jQuery(document).ready(function ($) {
+            // Initialize Datepickers
+            $('#my_date_picker').datepicker();
+            $('#my_date_picker1').datepicker();
+
+            // Update filter values and trigger filter when datepicker values change
+            $('#my_date_picker, #my_date_picker1').change(function () {
+                updateFilterValues();
+                filterData();
+            });
+
+            // Trigger filter on page load
+            filterData();
+        });
+
+        function filterByDate(pageNumber) {
+            // Get the values of fromDate and toDate from the input fields
+            var fromDate = $('#my_date_picker').val();
+            var toDate = $('#my_date_picker1').val();
+
+            // Send an AJAX request to the LocChiTiet action in the controller
+            $.ajax({
+                url: '/admin/chitietsddien/LocChiTiet',
+                type: 'GET',
+                data: {
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    page: pageNumber
+                },
+                success: function (data) {
+                    // Update the table content and pagination links with the received data
+                    $('#ct').html($(data).find('#ct').html());
+                    $('#paginationContainer').html($(data).find('#paginationContainer').html());
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
     </script>
 }
-
-
-

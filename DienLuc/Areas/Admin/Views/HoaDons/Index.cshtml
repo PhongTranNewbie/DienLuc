@@ -5,45 +5,35 @@
     ViewData["Title"] = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 
-    var dongHoDienList = ViewBag.DHD as List<DienLuc.Models.DongHoDien>;
-    var khachHangList = ViewBag.KhachHangList as List<DienLuc.Models.KhachHang>;
 }
 <div class="row">
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="trangThai">Trạng thái:</label>
-            <select id="trangThai" class="form-control">
+    <div class="col-md-3">
+        <div class="input-group">
+            <input type="text" id="my_date_picker" class="form-control" placeholder="Từ ngày">
+            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="input-group">
+            <input type="text" id="my_date_picker1" class="form-control" placeholder="Đến ngày">
+            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="input-group">
+            <select id="trangThai" class="form-select custom-select">
                 <option value="">Tất cả</option>
                 <option value="Đã thanh toán">Đã thanh toán</option>
                 <option value="Chưa thanh toán">Chưa thanh toán</option>
             </select>
+
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="maDh">Mã đồng hồ:</label>
-            <select id="maDh" class="form-control">
-                <option value="">Tất cả</option>
-                @foreach (var dongHo in dongHoDienList)
-                {
-                    <option value="@dongHo.MaDh">@dongHo.MaDh</option>
-                }
-            </select>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="maKh">Mã khách hàng:</label>
-            <select id="maKh" class="form-control">
-                <option value="">Tất cả</option>
-                @foreach (var khachHang in khachHangList)
-                {
-                    <option value="@khachHang.MaKh">@khachHang.MaKh</option>
-                }
-            </select>
-        </div>
+    <div class="col-md-3">
+        <button class="btn btn-primary" onclick="filterByDateHD(1)">Lọc</button>
     </div>
 </div>
+
 <h1>Danh sách hóa đơn</h1>
 
 <p>
@@ -106,6 +96,7 @@
         @{
             int i = 0;
             string @cls = "table-success";
+            int j = 0;
 
         }
         @foreach (var item in Model)
@@ -139,10 +130,11 @@
                     @(item.ChiSoMoi - item.ChiSoCu)
                 </td>
                 <td>
-                    @if (i < ViewBag.ListThue.Count) // Kiểm tra chỉ mục trước khi truy cập
+                    @if (j < ViewBag.ListThue.Count) // Kiểm tra chỉ mục trước khi truy cập
                     {
-                        
-                        @string.Format("{0:N0}", ViewBag.ListThue[i])
+
+                        @string.Format("{0:N0}", ViewBag.ListThue[j])
+                        j++;
                     }
                 </td>
                 <td>
@@ -177,44 +169,103 @@
                     <a class="btn btn-primary" asp-action="Delete" asp-route-id="@item.MaHd">Xóa</a>
                 </td>
             </tr>
+            
         }
     </tbody>
 </table>
-@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+<div id="paginationContainerA">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
 {
     LiElementClasses = new string[] { "page-item" },
     PageClasses = new string[] { "page-link" }
 })
-
+</div>
 @section Scripts {
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script>
-        $(document).ready(function () {
-            $('#trangThai, #maDh, #maKh').change(function () {
-                var trangThai = $('#trangThai').val();
-                var maDh = $('#maDh').val();
-                var maKh = $('#maKh').val();
+    <link href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css'
+          rel='stylesheet'>
 
-                $.ajax({
-                    url: '/admin/HoaDon/LocTheo',
-                    type: 'GET',
-                    data: { trangThai: trangThai, maDh: maDh, maKh: maKh },
-                    success: function (result) {
-                        $('#hoaDonTable tbody').html($(result).find('tbody').html());
-                        // Cập nhật phân trang nếu cần
-                        $('#paginationContainer').html($(result).find('#paginationContainer').html());
-                    },
-                    error: function () {
-                        console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
-                    }
-                });
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script>
+        jQuery(document).ready(function ($) {
+            // Initialize Datepickers
+            $('#my_date_picker').datepicker();
+            $('#my_date_picker1').datepicker();
+
+            // Bind event handler for changing trạng thái
+            $('#trangThai').change(function () {
+                updateFilterValues(); // Gọi hàm cập nhật giá trị lọc
+            });
+
+            // Update filter values and trigger filter when datepicker values change
+            $('#my_date_picker, #my_date_picker1').change(function () {
+                updateFilterValues(); // Gọi hàm cập nhật giá trị lọc
+            });
+
+            // Trigger filter on page load (optional)
+            updateFilterValues();
+        });
+
+        // Define variables to store filter values
+        var fromDate = "";
+        var toDate = "";
+        var trangThai = "";
+
+        // Function to update filter values
+        function updateFilterValues() {
+            fromDate = $('#my_date_picker').val();
+            toDate = $('#my_date_picker1').val();
+            trangThai = $('#trangThai').val();
+
+            // Update pagination links
+            updatePaginationLinks(1); // Gọi hàm cập nhật link phân trang
+        }
+
+        // Function to update pagination links
+        function updatePaginationLinks(pageNumber) {
+            // Update URL for pagination links including fromDate, toDate, and trangThai parameters
+            var url = '/admin/Hoadon/LocChiTietHD?page=' + pageNumber + '&fromDate=' + fromDate + '&toDate=' + toDate + '&trangThai=' + trangThai;
+            return url;
+        }
+
+        // Bind event handler for pagination links
+        $(document).on('click', '#paginationContainerA a', function (e) {
+            e.preventDefault(); // Prevent default behavior of the pagination links
+            var pageUrl = $(this).attr('href');
+            $.get(pageUrl, function (data) {
+                // Update the table content and pagination links with the received data
+                $('#hoaDonTable').html($(data).find('#hoaDonTable').html());
+                $('#paginationContainerA').html($(data).find('#paginationContainerA').html());
+
+                // Trigger filter function with the current page number
+                filterByDateHD(pageUrl.substring(pageUrl.indexOf('page=') + 5));
             });
         });
 
+        // Function to filter by date
+        function filterByDateHD(pageNumber) {
+            // Send an AJAX request to the LocChiTiet action in the controller
+            $.ajax({
+                url: '/admin/Hoadon/LocChiTietHD',
+                type: 'GET',
+                data: {
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    trangThai: trangThai,
+                    page: pageNumber
+                },
+                success: function (data) {
+                    // Update the table content and pagination links with the received data
+                    $('#hoaDonTable').html($(data).find('#hoaDonTable').html());
+                    $('#paginationContainerA').html($(data).find('#paginationContainerA').html());
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
     </script>
 }
+
 
 

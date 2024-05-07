@@ -1,8 +1,16 @@
 ﻿@using DienLuc.Models;
 @{
     Layout = "~/Areas/KhachHang/Views/Shared/_LayoutLoginKH.cshtml";
-}
 
+}
+<style>
+    .align-left {
+        float: left;
+        margin-right: 10px; /* Điều chỉnh khoảng cách giữa nút "Đăng nhập" và "Đăng ký" */
+        margin-bottom: 20px;
+    }
+
+</style>
 @model TaiKhoan
 
 <div asp-validation-summary="All" class="text-danger"></div>
@@ -17,11 +25,11 @@
     <div class="form-group">
         @Html.PasswordFor(x => x.Mk, new { @class = "form-control form-control-lg", placeholder = "Mật khẩu", required = "required" })
     </div>
-    <div style="margin-block: 15px;"class="mt-3">
+    <div style="margin-block: 15px;" class="mt-3">
         <button class="btn btn-block btn-lg font-weight-medium auth-form-btn custom-btn" type="submit">Đăng nhập</button>
     </div>
 
-    <a asp-action="DangKy" asp-controller="TaiKhoan" class="btn btn-primary">Đăng ký</a>
+    <a asp-action="DangKy" asp-controller="TaiKhoan" class="btn btn-primary align-left">Đăng ký</a>
 }
 @section Scripts {
     @{

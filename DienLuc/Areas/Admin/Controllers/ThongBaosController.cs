@@ -81,7 +81,15 @@ namespace DienLuc.Areas.Admin.Controllers
                     .Include(x => x.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation)
                     .Select(x => x.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation.Email)
                     .FirstOrDefault();
-                await _emailSender.SendEmailAsync(email, "Thông báo đã được gửi", $"Mã hóa đơn: {thongBao.MaHd}, Ngày thông báo: {thongBao.NgayThongBao}, Nội dụng: {thongBao.NoiDung}");
+                var tt = _context.ThongBaos.Include(x => x.MaHdNavigation).Where(x => x.MaHd == thongBao.MaHd).Select(x => x.MaHdNavigation.SoTienCanThanhToan).FirstOrDefault();
+                await _emailSender.SendEmailAsync(email, "Thông báo đã được gửi",
+                    $"Mã hóa đơn: {thongBao.MaHd}\n" +
+                    $"Ngày thông báo: {thongBao.NgayThongBao}\n" +
+                    $"Ngày hết hạn cho thông báo: {thongBao.NgayHetHan}\n" +
+                    $"Nội dung: {thongBao.NoiDung} với số tiền là {tt:N0} VND");
+
+
+
 
                 return RedirectToAction(nameof(Index));
             }

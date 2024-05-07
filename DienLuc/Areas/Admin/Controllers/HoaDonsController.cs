@@ -27,20 +27,20 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("Danhsachhoadon")]
         public IActionResult Index(int? page)
         {
-            int pageSize = 12;
+            int pageSize = 2;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var hoadon = _context.HoaDons
                 .AsNoTracking()
                 .OrderByDescending(x => x.MaHd)
                 .Include(h => h.MaChiTietSddienNavigation)
                 .Include(h => h.MaChiTietSddienNavigation.MaDhNavigation)
-                .Include(h => h.MaPtttoanNavigation);
-            PagedList<HoaDon> mhd = new PagedList<HoaDon>(hoadon, pageNumber, pageSize);
+                .Include(h => h.MaPtttoanNavigation)
+                .ToList(); // Lấy dữ liệu từ cơ sở dữ liệu và chuyển sang danh sách
 
             List<decimal> listThue = new List<decimal>();
 
             // Tính số thuế cho mỗi hóa đơn và thêm vào danh sách
-            foreach (var hoaDon in mhd)
+            foreach (var hoaDon in hoadon)
             {
                 decimal thue = Thue(hoaDon);
                 listThue.Add(thue);
@@ -49,11 +49,11 @@ namespace DienLuc.Areas.Admin.Controllers
             // Truyền danh sách thuế vào ViewBag hoặc model
             ViewBag.ListThue = listThue; // Hoặc truyền vào model nếu bạn đang sử dụng model
 
+            PagedList<HoaDon> mhd = new PagedList<HoaDon>(hoadon, pageNumber, pageSize);
 
-            ViewBag.DHD = _context.DongHoDiens.ToList();
-            ViewBag.khachHangList = _context.KhachHangs.ToList();
             return View(mhd);
         }
+
 
 
         [HttpGet("GetChiSoThangTruoc/{maChiTietSddien}")]
@@ -506,13 +506,12 @@ namespace DienLuc.Areas.Admin.Controllers
             return _context.HoaDons.Any(e => e.MaHd == id);
         }
 
-        [HttpGet("LocTheo")]
-        public IActionResult Filter(string trangThai, string maDh, string maKh, int? page)
+        [HttpGet("LocChiTietHD")]
+        public IActionResult FilterHoaDon(string trangThai, string maDh, string maKh, DateTime? fromDate, DateTime? toDate, int? page)
         {
-            int pageSize = 12;
+            int pageSize = 2;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
-            
-            
+
             IQueryable<HoaDon> hoaDons = _context.HoaDons.Include(h => h.MaChiTietSddienNavigation.MaDhNavigation);
 
             // Kiểm tra và lọc theo trạng thái nếu có giá trị truyền vào
@@ -533,17 +532,38 @@ namespace DienLuc.Areas.Admin.Controllers
                 hoaDons = hoaDons.Where(h => h.MaChiTietSddienNavigation.MaDhNavigation.MaKh == maKh);
             }
 
+            // Kiểm tra và lọc theo ngày nếu có giá trị truyền vào
+            if (fromDate != null)
+            {
+                hoaDons = hoaDons.Where(h => h.NgayTao.Date >= fromDate.Value.Date);
+            }
+            if (toDate != null)
+            {
+                hoaDons = hoaDons.Where(h => h.NgayTao.Date <= toDate.Value.Date);
+            }
+
             // Chuyển IQueryable sang List
             var filteredData = hoaDons.AsNoTracking().OrderByDescending(x => x.MaHd).ToList();
+
+            List<decimal> listThue = new List<decimal>();
+
+            // Tính số thuế cho mỗi hóa đơn và thêm vào danh sách
+            foreach (var hoaDon in filteredData)
+            {
+                decimal thue = Thue(hoaDon);
+                listThue.Add(thue);
+            }
+
+            // Truyền danh sách thuế vào ViewBag hoặc model
+            ViewBag.ListThue = listThue; // Hoặc truyền vào model nếu bạn đang sử dụng model
+
             PagedList<HoaDon> mhd = new PagedList<HoaDon>(filteredData, pageNumber, pageSize);
             // Truyền danh sách đồng hồ điện và danh sách khách hàng vào ViewBag để sử dụng trong PartialView
-            ViewBag.DHD = _context.DongHoDiens.ToList();
-            ViewBag.khachHangList = _context.KhachHangs.ToList();
+            
 
             // Trả về PartialView chứa danh sách hóa đơn đã lọc
-            return View("Index", mhd);
+            return PartialView("Index", mhd);
         }
-
 
 
 

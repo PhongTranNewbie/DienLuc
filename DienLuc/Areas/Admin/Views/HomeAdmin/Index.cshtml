@@ -3,9 +3,6 @@
     ViewData["Title"] = "Index";
 }
 
-Date:
-<input type="text" id="my_date_picker">
-
 
 <script>
     // Avoiding conflicts with other libraries
@@ -14,9 +11,13 @@ Date:
         console.log("jQuery loaded successfully.");
         console.log($('#my_date_picker')); // Check if this selector returns the correct element
 
-        // Initialize Datepicker
+        // Initialize Datepicker for the first input field
         $('#my_date_picker').datepicker();
+
+        // Initialize Datepicker for the second input field
+        $('#my_date_picker1').datepicker();
     });
 </script>
+
 
 

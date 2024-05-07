@@ -27,7 +27,7 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("DanhsachSDDien")]
         public IActionResult Index(int? page)
         {
-            int pageSize = 12;
+            int pageSize = 2;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var ctdh = _context.ChiTietSddiens.AsNoTracking().OrderByDescending(x => x.Id).Include(c => c.MaDhNavigation).Include(c => c.MaNvNavigation);
             PagedList<ChiTietSddien> ct = new PagedList<ChiTietSddien>(ctdh, pageNumber, pageSize);
@@ -320,5 +320,41 @@ namespace DienLuc.Areas.Admin.Controllers
             // Trả về view với dữ liệu đã lọc và phân trang
             return View("Index", pagedList);
         }
+        [HttpGet("LocChiTiet")]
+        // Trong phương thức LocTheoNgay
+        public IActionResult LocTheoNgay(DateTime? fromDate, DateTime? toDate, int? page)
+        {
+            int pageSize = 2;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+            ViewData["pageNumber"] = pageNumber;
+
+            // Truy vấn cơ sở dữ liệu để lấy dữ liệu trong khoảng thời gian từ fromDate đến toDate
+            var query = _context.ChiTietSddiens.Include(x => x.MaDhNavigation).AsQueryable();
+
+            if (fromDate != null)
+            {
+                query = query.Where(x => x.NgayLayThongTin.Date >= fromDate.Value.Date);
+            }
+            if (toDate != null)
+            {
+                query = query.Where(x => x.NgayLayThongTin.Date <= toDate.Value.Date);
+            }
+
+            var chiTietSdDienList = query
+                .AsNoTracking()
+                .OrderByDescending(x => x.Id) // Sắp xếp theo ID hoặc một trường khác nếu cần
+                .ToList();
+
+            // Phân trang dữ liệu
+            PagedList<ChiTietSddien> ct = new PagedList<ChiTietSddien>(chiTietSdDienList, pageNumber, pageSize);
+
+            // Trả về view với dữ liệu đã lọc và phân trang
+            return PartialView("Index", ct); // Chỉ cần trả về PartialView, không cần trả về View "Index"
+        }
+
+
+
+
     }
+
 }
