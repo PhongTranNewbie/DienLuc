@@ -4,14 +4,14 @@
     Layout = "~/Areas/KhachHang/Views/Shared/_LayoutKH.cshtml";
 }
 <h2>Danh sách các đồng hồ</h2>
-<table class="table">
+<table id="dk" class="table">
     <thead>
         <tr class="table-warning">
             <th>
                 Mã đồng hồ
             </th>
             <th>
-                Mã khách hàng
+                Họ và tên
             </th>
             <th>
                 Trạng thái
@@ -25,6 +25,7 @@
             <th></th>
         </tr>
     </thead>
+    <tbody>
     @{
             int i = 0;
             string @cls = "table-success";
@@ -39,7 +40,7 @@
         }
         <tr class="@cls">
             <td>@item.MaDh</td>
-            <td>@item.MaKh</td>
+                <td>@item.MaKhNavigation.Ho @item.MaKhNavigation.Ten </td>
             <td>@item.TrangThai</td>
             <td>@item.NgayHoatDong</td>
             <td>@item.LoaiDhd</td>
@@ -48,9 +49,53 @@
             </td>
         </tr>
     }
+    </tbody>
 </table>
+<div class="center" id="paginationContainer1">
 @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
    {
        LiElementClasses = new string[] { "page-item" },
        PageClasses = new string[] { "page-link" }
    })
+</div>
+@section Scripts {
+    <script>
+            
+            // Biến toàn cục để lưu trữ ID của setTimeout
+            var timeoutId;
+
+            // Function để lọc dữ liệu bằng mã đồng hồ
+            function filterByMaHoaDon() {
+                // Xóa timeout trước đó nếu có
+                clearTimeout(timeoutId);
+
+                // Lấy giá trị mã đồng hồ
+                var maDongHo = $('#txtMaHoaDon').val();
+
+                // Thiết lập timeout để gửi yêu cầu Ajax sau 500ms khi không có thêm ký tự mới được nhập vào
+                timeoutId = setTimeout(function () {
+                    $.ajax({
+                        url: '/Khachhang/DongHo/DongHoDien',
+                        type: 'GET',
+                        data: { maDongHo: maDongHo, page: 1 },
+                        success: function (result) {
+                            $('#dk tbody').html($(result).find('tbody').html());
+                            $('#paginationContainer1').html($(result).find('#paginationContainer1').html());
+                        },
+                        error: function () {
+                            console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
+                        }
+                    });
+                }, 200); // Chờ 500ms trước khi gửi yêu cầu Ajax
+            }
+
+
+            // Bind sự kiện cho các liên kết phân trang
+            $(document).on('click', '#paginationContainer1 a', function (e) {
+                e.preventDefault(); // Ngăn chặn hành vi mặc định của các liên kết phân trang
+                var pageUrl = $(this).attr('href');
+                var pageNumber = pageUrl.substring(pageUrl.indexOf('page=') + 5);
+                updateData(pageNumber); // Gọi hàm để cập nhật dữ liệu khi người dùng chuyển trang
+            });
+    </script>
+}

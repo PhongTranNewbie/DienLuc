@@ -56,6 +56,7 @@ namespace DienLuc.Areas.KhachHang.Controllers
                     {
                         HttpContext.Session.SetString("MaTk", user.MaTk);
                         HttpContext.Session.SetString("Role", user.LoaiTk);
+                        TempData["successMessage"] = "Đã đăng nhập thành công";
 
                         return RedirectToAction("Index", "DongHo");
                     }
@@ -254,8 +255,9 @@ namespace DienLuc.Areas.KhachHang.Controllers
                         // Lưu thay đổi vào cơ sở dữ liệu
                         _context.KhachHangs.Update(nhanVien);
                         await _context.SaveChangesAsync();
+                        TempData["successMessage"] = "Đã chỉnh sửa thông tin thành công";
 
-                        return RedirectToAction("ThongTinNV");
+                        return RedirectToAction("ThongTinKhachHang");
                     }
                 }
             }

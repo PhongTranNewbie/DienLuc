@@ -24,6 +24,14 @@
     <!-- End layout styles -->
     <link rel="shortcut icon" href="~/LayoutAdmin/assets/images/favicon.ico" />
     <style>
+        
+        .center {
+            display: flex;
+            justify-content: center;
+            margin-block: 10px;
+        }
+
+    
         .custom-bootstrap-icon {
             display: inline-block;
             font-family: bootstrap-icons !important;
@@ -77,7 +85,7 @@
                         <div class="input-group-prepend bg-transparent">
                             <i class="input-group-text border-0 mdi mdi-magnify"></i>
                         </div>
-                        <input type="text" class="form-control bg-transparent border-0" placeholder="Search projects">
+                        <input type="text" id="txtMaHoaDon" class="form-control bg-transparent border-0" placeholder="Tìm kiếm" oninput="filterByMaHoaDon()">
                     </div>
                 </form>
             </div>
@@ -131,12 +139,6 @@
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
             <ul class="nav">
                 
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/Trangchu">
-                        <span class="menu-title">Trang chủ</span>
-                        <i class="mdi mdi-home menu-icon"></i>
-                    </a>
-                </li>
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
                         <span class="menu-title">Đồng hồ</span>
@@ -215,7 +217,7 @@
                     else if (!string.IsNullOrWhiteSpace(errorMessage))
                     {
                         <div class="alert alert-success">
-                            <b>Lỗi: </b>@successMessage
+                            <b>Lỗi: </b>@errorMessage
                             <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     }

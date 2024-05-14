@@ -17,14 +17,22 @@
     <link rel="stylesheet" href="~/LayoutAdmin/assets/css/style.css">
     <!-- End layout styles -->
     <link rel="shortcut icon" href="~/LayoutAdmin/assets/images/favicon.ico" />
+    <style>
+        .center {
+            display: flex;
+            justify-content: center;
+            margin-block: 10px;
+        }
+    </style>
 </head>
 <body>
     
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
             <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-                <a class="navbar-brand brand-logo" href="index.html"><img src="~/LayoutAdmin/assets/images/logo.svg" alt="logo" /></a>
-                <a class="navbar-brand brand-logo-mini" href="index.html"><img src="~/LayoutAdmin/assets/images/logo-mini.svg" alt="logo" /></a>
+                <a class="navbar-brand brand-logo" href="index.html">
+                    Điện lực
+                </a>
             </div>
             <div class="navbar-menu-wrapper d-flex align-items-stretch">
                 <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
@@ -36,8 +44,8 @@
                             <div class="input-group-prepend bg-transparent">
                                 <i class="input-group-text border-0 mdi mdi-magnify"></i>
                             </div>
-                            <input type="text" class="form-control bg-transparent border-0" placeholder="Search projects">
-                        </div>
+                        <input type="text" id="txtMaHoaDon" class="form-control bg-transparent border-0" placeholder="Tìm kiếm" oninput="filterByMaHoaDon()">
+                    </div>
                     </form>
                 </div>
                 <ul class="navbar-nav navbar-nav-right">
@@ -101,13 +109,7 @@
             <!-- partial:partials/_sidebar.html -->
             <nav class="sidebar sidebar-offcanvas" id="sidebar">
                 <ul class="nav">
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="/khachhang/danhsachdongho">
-                            <span class="menu-title">Trang chủ</span>
-                            <i class="mdi mdi-home menu-icon"></i>
-                        </a>
-                    </li>
+                   
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
                             <span class="menu-title">Hóa đơn</span>
@@ -136,12 +138,7 @@
                         <i class="mdi mdi-format-list-bulleted menu-icon"></i>
                     </a>
                 </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/khachhang/dangxuat">
-                            <span class="menu-title">Đăng xuất</span>
-                            <i class="mdi mdi-table-large menu-icon"></i>
-                        </a>
-                    </li>
+                   
                     
                 </ul>
             </nav>
@@ -149,6 +146,24 @@
             <div class="main-panel">
                 <div class="content-wrapper">
                 <div style="overflow-x:auto;" class="content-wrapper">
+                    @{
+                        var errorMessage = TempData["errorMessage"]?.ToString();
+                        var successMessage = TempData["successMessage"]?.ToString();
+                    }
+                    @if (!string.IsNullOrWhiteSpace(@successMessage))
+                    {
+                        <div class="alert alert-success">
+                            <b>Hoàn thành: </b>@successMessage
+                            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(errorMessage))
+                    {
+                        <div class="alert alert-success">
+                            <b>Lỗi: </b>@successMessage
+                            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
                     @RenderBody()
                     @RenderSection("content", required: false)
 

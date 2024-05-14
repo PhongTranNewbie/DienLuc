@@ -46,6 +46,7 @@ namespace Dienluc.Areas.Admin.Controllers
                     {
                         HttpContext.Session.SetString("MaTk", admin.MaTk);
                         HttpContext.Session.SetString("Role", admin.LoaiTk);
+                        TempData["successMessage"] = "Đã đăng nhập thành công";
 
                         return RedirectToAction("Index", "DongHoDiens");
                     }
@@ -53,6 +54,7 @@ namespace Dienluc.Areas.Admin.Controllers
                     {
                         HttpContext.Session.SetString("MaTk", nhanvien.MaTk);
                         HttpContext.Session.SetString("Role", nhanvien.LoaiTk);
+                        TempData["successMessage"] = "Đã đăng nhập thành công";
 
                         return RedirectToAction("Index", "DongHoDiens");
                     }
@@ -76,32 +78,12 @@ namespace Dienluc.Areas.Admin.Controllers
             return RedirectToAction("Login");
         }
 
-        [HttpGet]
-        public IActionResult SignIn()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult SignIn(TaiKhoan taikhoan)
-        {
-            if (ModelState.IsValid)
-            {
-                // Assuming here that you have logic to add a new user to the database
-                _db.TaiKhoans.Add(taikhoan);
-                _db.SaveChanges();
-
-                // Redirect to login page after successful registration
-                return RedirectToAction("Login");
-            }
-
-            return View(taikhoan);
-        }
+        
 
         [HttpGet("DanhSachNV")]
         public IActionResult DanhSachNV(int? page)
         {
-            int pageSize = 12;
+            int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var lnv = _db.NhanViens.AsNoTracking().OrderByDescending(x => x.MaNv).Include(c => c.MatkNavigation).Include(c => c.VaiTroNavigation);
 
@@ -112,12 +94,69 @@ namespace Dienluc.Areas.Admin.Controllers
         [HttpGet("DanhSachKH")]
         public IActionResult DanhSachKH(int? page)
         {
-            int pageSize = 12;
+            int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var lnv = _db.KhachHangs.AsNoTracking().OrderByDescending(x => x.MaKh).Include(c => c.MatkNavigation);
 
             PagedList<KhachHang> kh = new PagedList<KhachHang>(lnv, pageNumber, pageSize);
             return View(kh);
+        }
+        [HttpGet("FilterByMaNhanVien")]
+        public IActionResult Filter(string maNhanVien, int? page)
+        {
+            int pageSize = 3;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+
+            // Lấy dữ liệu từ cơ sở dữ liệu
+            IQueryable<NhanVien> nhanVienData = _db.NhanViens.Include(x => x.MatkNavigation).Include(x => x.VaiTroNavigation);
+
+            
+
+            // Kiểm tra và lọc theo mã đồng hồ nếu có giá trị truyền vào
+            if (!string.IsNullOrEmpty(maNhanVien))
+            {
+                nhanVienData = nhanVienData.Where(h => h.MaNv.Contains(maNhanVien) || h.Ho.Contains(maNhanVien) || h.Ten.Contains(maNhanVien));
+
+            }
+
+
+            // Sắp xếp theo MaDh giảm dần và chuyển sang danh sách không theo dõi
+            var filteredData = nhanVienData.AsNoTracking().OrderByDescending(x => x.MaNv).AsNoTracking().ToList();
+
+            // Tạo đối tượng PagedList để phân trang
+            PagedList<NhanVien> pagedData = new PagedList<NhanVien>(filteredData, pageNumber, pageSize);
+
+            // Trả về view chứa danh sách đồng hồ đã lọc
+            return PartialView("DanhSachNV", pagedData);
+        }
+
+        [HttpGet("FilterByMaKH")]
+        public IActionResult FilterKH(string maNhanVien, int? page)
+        {
+            int pageSize = 3;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+
+            // Lấy dữ liệu từ cơ sở dữ liệu
+            IQueryable<KhachHang> khData = _db.KhachHangs.Include(x => x.MatkNavigation);
+
+
+
+            // Kiểm tra và lọc theo mã đồng hồ nếu có giá trị truyền vào
+            if (!string.IsNullOrEmpty(maNhanVien))
+            {
+                khData = khData.Where(h => h.MaKh.Contains(maNhanVien) || h.Ho.Contains(maNhanVien) || h.Ten.Contains(maNhanVien));
+
+            }
+
+
+            // Sắp xếp theo MaDh giảm dần và chuyển sang danh sách không theo dõi
+            var filteredData = khData.AsNoTracking().OrderByDescending(x => x.MaKh).AsNoTracking().ToList();
+
+            // Tạo đối tượng PagedList để phân trang
+            PagedList<KhachHang> pagedData = new PagedList<KhachHang>(filteredData, pageNumber, pageSize);
+
+            // Trả về view chứa danh sách đồng hồ đã lọc
+            return PartialView("DanhSachKH", pagedData);
         }
     }
 }

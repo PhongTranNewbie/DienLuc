@@ -5,7 +5,7 @@
 }
 <h2>Danh sách hóa đơn</h2>
 
-<table class="table">
+<table id="dk" class="table">
     <thead>
         <tr class="table-warning">
             <th>
@@ -21,9 +21,6 @@
                 Ngày thanh toán
             </th>
             <th>
-                Trạng thái
-            </th>
-            <th>
                 Chỉ số cũ
             </th>
             <th>
@@ -33,17 +30,25 @@
                 Chỉ số tiêu thụ
             </th>
             <th>
+                Thuế
+            </th>
+            <th>
+                Số nợ
+            </th>
+            <th>
                 Số tiền cần thanh toán
             </th>
             <th>
                 Số tiền đã thanh toán
             </th>
+
             <th>
                 Mã đồng hồ
             </th>
             <th>
-                Mã khách hàng
+                Trạng thái
             </th>
+
             <th></th>
         </tr>
     </thead>
@@ -51,6 +56,8 @@
         @{
             int i = 0;
             string @cls = "table-success";
+            int j = 0;
+
         }
         @foreach (var hoaDon in Model)
         {
@@ -74,9 +81,6 @@
                     @Html.DisplayFor(modelItem => hoaDon.NgayThanhToan)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => hoaDon.TrangThai)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => hoaDon.ChiSoCu)
                 </td>
                 <td>
@@ -84,6 +88,17 @@
                 </td>
                 <td>
                     @(hoaDon.ChiSoMoi - hoaDon.ChiSoCu)
+                </td>
+                <td>
+                    @if (j < ViewBag.ListThue.Count) // Kiểm tra chỉ mục trước khi truy cập
+                    {
+
+                        @string.Format("{0:N0}", ViewBag.ListThue[j])
+                        j++;
+                    }
+                </td>
+                <td>
+                    @string.Format("{0:N0}", hoaDon.SoNo)
                 </td>
                 <td>
                     @string.Format("{0:N0}", hoaDon.SoTienCanThanhToan)
@@ -95,12 +110,10 @@
                 <td>
                     @Html.DisplayFor(modelItem => hoaDon.MaChiTietSddienNavigation.MaDh)
                 </td>
-
                 <td>
-
-                    @Html.DisplayFor(modelItem => hoaDon.MaChiTietSddienNavigation.MaDhNavigation.MaKh)
-
+                    @Html.DisplayFor(modelItem => hoaDon.TrangThai)
                 </td>
+
                 <td>
                     <a asp-controller="ThanhToan" asp-action="ThanhToan" asp-route-maHd="@hoaDon.MaHd" class="btn btn-primary">Thanh toán</a>
                 </td>
@@ -109,8 +122,55 @@
 
     </tbody>
 </table>
-@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+<div class="center" id="paginationContainer2a">
+    @Html.PagedListPager(Model, page => Url.Action("DanhSachHoaDon", new { page = page }), new PagedListRenderOptions
 {
     LiElementClasses = new string[] { "page-item" },
     PageClasses = new string[] { "page-link" }
 })
+</div>
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+
+        // Biến toàn cục để lưu trữ ID của setTimeout
+        var timeoutId;
+
+        // Function để lọc dữ liệu bằng mã đồng hồ
+        function filterByMaHoaDon() {
+            // Xóa timeout trước đó nếu có
+            clearTimeout(timeoutId);
+
+            // Lấy giá trị mã đồng hồ
+            var mahd = $('#txtMaHoaDon').val();
+
+            // Thiết lập timeout để gửi yêu cầu Ajax sau 500ms khi không có thêm ký tự mới được nhập vào
+            timeoutId = setTimeout(function () {
+                $.ajax({
+                    url: '/khachhang/thanhtoan/DongHoDienCTT',
+                    type: 'GET',
+                    data: { mahd: mahd, page: 1 },
+                    success: function (result) {
+                        $('#dk tbody').html($(result).find('tbody').html());
+                        $('#paginationContainer2a').html($(result).find('#paginationContainer2a').html());
+                    },
+                    error: function () {
+                        console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
+                    }
+                });
+            }, 500); // Chờ 500ms trước khi gửi yêu cầu Ajax
+        }
+
+
+        // Bind sự kiện cho các liên kết phân trang
+        $(document).on('click', '#paginationContainer2a a', function (e) {
+            e.preventDefault(); // Ngăn chặn hành vi mặc định của các liên kết phân trang
+            var pageUrl = $(this).attr('href');
+            var pageNumber = pageUrl.substring(pageUrl.indexOf('page=') + 5);
+            updateData(pageNumber); // Gọi hàm để cập nhật dữ liệu khi người dùng chuyển trang
+        });
+    </script>
+}

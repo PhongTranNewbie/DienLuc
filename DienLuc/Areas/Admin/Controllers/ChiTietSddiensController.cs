@@ -98,25 +98,36 @@ namespace DienLuc.Areas.Admin.Controllers
 
 
             var maxChiTiet = _context.ChiTietSddiens
-        .Where(c => c.MaDh == chiTietSddien.MaDh)
-        .OrderByDescending(c => c.NgayLayThongTin)
-        .FirstOrDefault();
+                .Where(c => c.MaDh == chiTietSddien.MaDh)
+                .OrderByDescending(c => c.NgayLayThongTin)
+                .FirstOrDefault();
 
-            // Nếu có chi tiết sử dụng điện trước đó
-            if (maxChiTiet != null)
+            // Kiểm tra xem chi tiết mới có tháng và năm bé hơn hoặc bằng tháng và năm lớn nhất không
+            if (maxChiTiet != null && chiTietSddien.NgayLayThongTin.Year <= maxChiTiet.NgayLayThongTin.Year)
             {
-                // Kiểm tra xem chi tiết mới có tháng và năm bé hơn hoặc bằng tháng và năm lớn nhất không
-                if (chiTietSddien.NgayLayThongTin.Year < maxChiTiet.NgayLayThongTin.Year ||
-                    chiTietSddien.NgayLayThongTin.Year == maxChiTiet.NgayLayThongTin.Year &&
-                     chiTietSddien.NgayLayThongTin.Month <= maxChiTiet.NgayLayThongTin.Month)
+                // Nếu chi tiết mới có cùng năm với chi tiết cuối cùng
+                if (chiTietSddien.NgayLayThongTin.Year == maxChiTiet.NgayLayThongTin.Year)
                 {
-                    ModelState.AddModelError(string.Empty, "Không thể tạo chi tiết sử dụng điện cho tháng và năm này.");
-                    // Load danh sách đồng hồ và nhân viên để hiển thị lại form
-                    ViewBag.MaDh = new SelectList(_context.DongHoDiens, "MaDh", "MaDh", chiTietSddien.MaDh);
-                    ViewBag.MaNv = new SelectList(_context.NhanViens, "MaNv", "MaNv", chiTietSddien.MaNv);
-                    return View(chiTietSddien);
+                    // Kiểm tra xem chi tiết mới có tháng bé hơn hoặc bằng tháng của chi tiết cuối cùng không
+                    if (chiTietSddien.NgayLayThongTin.Month <= maxChiTiet.NgayLayThongTin.Month)
+                    {
+                        ModelState.AddModelError(string.Empty, $"Không thể tạo chi tiết sử dụng điện với tháng {chiTietSddien.NgayLayThongTin.Month}");
+                        // Load danh sách đồng hồ và nhân viên để hiển thị lại form
+                        ViewBag.MaDh = new SelectList(_context.DongHoDiens, "MaDh", "MaDh", chiTietSddien.MaDh);
+                        ViewBag.MaNv = new SelectList(_context.NhanViens, "MaNv", "MaNv", chiTietSddien.MaNv);
+                        return View(chiTietSddien);
+                    }
+                } else
+                {
+                        ModelState.AddModelError(string.Empty, $"Không thể tạo chi tiết sử dụng điện cho đồng hồ với năm bé hơn chi tiết trước đó là {maxChiTiet.NgayLayThongTin.Year}");
+                        // Load danh sách đồng hồ và nhân viên để hiển thị lại form
+                        ViewBag.MaDh = new SelectList(_context.DongHoDiens, "MaDh", "MaDh", chiTietSddien.MaDh);
+                        ViewBag.MaNv = new SelectList(_context.NhanViens, "MaNv", "MaNv", chiTietSddien.MaNv);
+                        return View(chiTietSddien);
+                    
                 }
             }
+
 
 
             var lastestCsd = _context.ChiTietSddiens.Where(c => c.MaDh == chiTietSddien.MaDh).OrderByDescending(c => c.NgayLayThongTin).Select(c => c.ChiSoDien).FirstOrDefault();
@@ -210,60 +221,45 @@ namespace DienLuc.Areas.Admin.Controllers
             return View(chiTietSddien);
         }
 
-        // GET: ChiTietSddiens/Delete/5
-        [HttpGet("Xoa/{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var chiTietSddien = await _context.ChiTietSddiens
-                .Include(c => c.MaDhNavigation)
-                .Include(c => c.MaNvNavigation)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (chiTietSddien == null)
-            {
-                return NotFound();
-            }
-
-            return View(chiTietSddien);
-        }
+        
 
         // POST: ChiTietSddiens/Delete/5
-        [HttpPost("Xoa/{id}")]
-        [ValidateAntiForgeryToken]
+        [HttpGet("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var chiTietSddien = await _context.ChiTietSddiens
-                .Include(c => c.MaDhNavigation)
-                .Include(c => c.MaNvNavigation)
-                .FirstOrDefaultAsync(m => m.Id == id); ;
+                    .Include(c => c.MaDhNavigation)
+                    .Include(c => c.MaNvNavigation)
+                    .FirstOrDefaultAsync(m => m.Id == id); ;
+
+                if (chiTietSddien == null)
+                {
+                    return NotFound();
+                }
+
                 // Kiểm tra xem chi tiết sử dụng điện đã được sử dụng để tạo hóa đơn chưa
                 var isUsedInInvoice = await _context.HoaDons.AnyAsync(hd => hd.MaChiTietSddien == id);
 
                 if (isUsedInInvoice)
                 {
-                    ModelState.AddModelError(string.Empty, "Không thể xóa chi tiết sử dụng điện này vì đã được sử dụng để tạo hóa đơn.");
-                    return View("Delete", chiTietSddien);
+                    TempData["errorMessage"] = "Không thể xóa chi tiết sử dụng điện này vì đã được sử dụng để tạo hóa đơn.";
+
+                    return RedirectToAction("Index");
                 }
 
-                if (chiTietSddien != null)
-                {
-                    _context.ChiTietSddiens.Remove(chiTietSddien);
-                }
-
+                _context.ChiTietSddiens.Remove(chiTietSddien);
                 await _context.SaveChangesAsync();
                 TempData["successMessage"] = "Đã xóa chi tiết sử dụng điện thành công";
                 return RedirectToAction(nameof(Index));
             }
-            ModelState.AddModelError(string.Empty, "Không thể xóa chi tiết sử dụng điện này vì đã được sử dụng để tạo hóa đơn.");
+
+            // Nếu ModelState không hợp lệ, tức là có lỗi xảy ra trong quá trình xử lý yêu cầu
             TempData["errorMessage"] = "Xóa chi tiết sử dụng điện thất bại";
-            return RedirectToAction(nameof(Delete));
+            return RedirectToAction(nameof(Index));
         }
+
 
         private bool ChiTietSddienExists(int id)
         {
@@ -321,8 +317,7 @@ namespace DienLuc.Areas.Admin.Controllers
             return View("Index", pagedList);
         }
         [HttpGet("LocChiTiet")]
-        // Trong phương thức LocTheoNgay
-        public IActionResult LocTheoNgay(DateTime? fromDate, DateTime? toDate, int? page)
+        public IActionResult LocTheoNgay(DateTime? fromDate, DateTime? toDate, int? page, string maCT)
         {
             int pageSize = 2;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
@@ -331,6 +326,18 @@ namespace DienLuc.Areas.Admin.Controllers
             // Truy vấn cơ sở dữ liệu để lấy dữ liệu trong khoảng thời gian từ fromDate đến toDate
             var query = _context.ChiTietSddiens.Include(x => x.MaDhNavigation).AsQueryable();
 
+            if (!string.IsNullOrEmpty(maCT))
+            {
+                // Chuyển đổi maCT sang kiểu int (nếu có thể)
+                if (int.TryParse(maCT, out int maCTInt))
+                {
+                    // Tìm kiếm theo Id
+                    query = query.Where(x => x.Id == maCTInt);
+                }
+                
+            }
+
+            // Thêm điều kiện tìm kiếm theo khoảng thời gian
             if (fromDate != null)
             {
                 query = query.Where(x => x.NgayLayThongTin.Date >= fromDate.Value.Date);
@@ -340,17 +347,19 @@ namespace DienLuc.Areas.Admin.Controllers
                 query = query.Where(x => x.NgayLayThongTin.Date <= toDate.Value.Date);
             }
 
+            // Sắp xếp và lấy dữ liệu
             var chiTietSdDienList = query
                 .AsNoTracking()
-                .OrderByDescending(x => x.Id) // Sắp xếp theo ID hoặc một trường khác nếu cần
+                .OrderByDescending(x => x.Id)
                 .ToList();
 
             // Phân trang dữ liệu
             PagedList<ChiTietSddien> ct = new PagedList<ChiTietSddien>(chiTietSdDienList, pageNumber, pageSize);
 
-            // Trả về view với dữ liệu đã lọc và phân trang
-            return PartialView("Index", ct); // Chỉ cần trả về PartialView, không cần trả về View "Index"
+            // Trả về PartialView với dữ liệu đã lọc và phân trang
+            return PartialView("Index", ct);
         }
+
 
 
 

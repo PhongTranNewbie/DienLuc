@@ -8,7 +8,7 @@
     <div class="page-header">
         <nav style="--cui-breadcrumb-divider: '>';" aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a asp-action="Index">Danh sách đồng hồ</a></li>
+                <li class="breadcrumb-item"><a asp-action="Index">Danh sách hóa đơn</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Thêm mới</li>
             </ol>
         </nav>
@@ -19,13 +19,7 @@
         <h1>Thêm hóa đơn</h1>
         <div class="col-md-4">
             <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="MaHd" class="control-label">Mã hóa đơn</label>
-                    <input asp-for="MaHd" class="form-control" />
-                    <span asp-validation-for="MaHd" class="text-danger"></span>
-                </div>
-            
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>    
                 <div class="form-group">
                     <label class="control-label">Mã khách hàng</label>
                     <input id="MaKh" class="form-control" readonly />
@@ -62,7 +56,7 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="TrangThai" class="control-label">Trạng thái</label>
-                    <select asp-for="TrangThai" class="form-control" >
+                    <select asp-for="TrangThai" class="form-control" readonly>
                         <option value="Chưa thanh toán">Chưa thanh toán</option>
                         <option value="Đã thanh toán">Đã thanh toán</option>
                     </select>

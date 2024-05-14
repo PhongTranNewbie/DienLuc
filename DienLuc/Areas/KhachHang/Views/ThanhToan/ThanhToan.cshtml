@@ -17,15 +17,25 @@
     <dl class="row">
         <dt class="col-sm-2">Mã hóa đơn:</dt>
         <dd class="col-sm-10">@Model.MaHd</dd>
-
+        <dt class="col-sm-2">Chỉ số cũ:</dt>
+        <dd class="col-sm-10">@Model.ChiSoCu</dd>
+        <dt class="col-sm-2">Chỉ số mới:</dt>
+        <dd class="col-sm-10">@Model.ChiSoMoi</dd>
+        <dt class="col-sm-2">Chỉ số tiêu thụ:</dt>
+        <dd class="col-sm-10">@(Model.ChiSoMoi - Model.ChiSoCu)</dd>
         <dt class="col-sm-2">Số tiền cần thanh toán:</dt>
-        <dd class="col-sm-10">@Model.SoTienCanThanhToan</dd>
+        <dd class="col-sm-10">@string.Format("{0:N0}", Model.SoTienCanThanhToan)</dd>
     </dl>
 </div>
 
 <form asp-action="ThanhToan">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
+    <select class="form-control" id="pttt" name="PTTT">
+        @foreach (var pttt in ViewBag.PTTT)
+        {
+            <option value="@pttt.MaPttt">@pttt.PhuongPhapTt</option>
+        }
+    </select>
     <div class="form-group">
         <label for="soTienThanhToan">Số tiền thanh toán:</label>
         <input type="number" id="soTienThanhToan" name="SoTienThanhToan" class="form-control" />

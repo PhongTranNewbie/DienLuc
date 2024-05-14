@@ -10,7 +10,7 @@
     <div class="col-md-4">
         <div class="form-group">
             <label for="trangThai">Trạng thái:</label>
-            <select id="trangThai" class="form-control">
+            <select id="trangThai" class="form-control" onchange="updateData(1)">
                 <option value="">Tất cả</option>
                 <option value="Đang hoạt động">Đang hoạt động</option>
                 <option value="Đã tạm dừng hoạt động">Đã tạm dừng hoạt động</option>
@@ -22,7 +22,7 @@
     <div class="col-md-4">
         <div class="form-group">
             <label for="LoaiDhd">Loại đồng hồ:</label>
-            <select id="LoaiDhd" class="form-control">
+            <select id="LoaiDhd" class="form-control" onchange="updateData(1)">
                 <option value="">Tất cả</option>
                 <option value="Điện tử">Điện tử</option>
                 <option value="Đĩa xoay">Đĩa xoay</option>
@@ -34,7 +34,7 @@
 <h1>Danh sách đồng hồ</h1>
 
 <p>
-    <a class="btn btn-primary" asp-action="Create">Tạo mới</a>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i></a>
 </p>
 <table id="dh" class="table">
     <thead>
@@ -88,45 +88,100 @@
                 @Html.DisplayFor(modelItem => item.LoaiDhd)
             </td>
             <td>
-                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.MaDh">Chỉnh sửa</a> |
-                    <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.MaDh">Chi tiết</a> |
-                    <a class="btn btn-primary" asp-action="Delete" asp-route-id="@item.MaDh">Xóa</a>
+                    <a class="btn btn-danger btn-sm rounded" asp-action="Edit" asp-route-id="@item.MaDh">
+                        <i class="bi bi-pencil"></i>
+                    </a> |
+
+                    <a onclick="if (confirm('Xác nhận xóa đồng hồ này hay không?') == true)
+                        {location.href='/admin/dongho/Xoa/@item.MaDh'}" class="btn btn-danger btn-sm rounded">
+                        <i class="bi bi-x-circle"></i>
+                    </a>
             </td>
         </tr>
 }
     </tbody>
 </table>
-@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+<div class="center" id="paginationContainerB">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
 {
     LiElementClasses = new string[] { "page-item" },
     PageClasses = new string[] { "page-link" }
 })
-@section Scripts {
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script>
-        $(document).ready(function () {
-            $('#trangThai, #LoaiDhd').change(function () {
-                var trangThai = $('#trangThai').val();
-                var LoaiDhd = $('#LoaiDhd').val();
+    @section Scripts {
+        <script>
+            $(document).ready(function () {
+                // Sự kiện thay đổi cho các dropdown
+                $('#trangThai, #LoaiDhd').change(function () {
+                    updateFilterValues(); // Gọi hàm để cập nhật giá trị lọc
+                    updateData(1); // Gọi hàm để cập nhật dữ liệu khi giá trị dropdown thay đổi
+                });
 
-                $.ajax({
-                    url: '/admin/dongho/DongHoDien',
-                    type: 'GET',
-                    data: { trangThai: trangThai, LoaiDhd: LoaiDhd },
-                    success: function (result) {
-                        $('#dh tbody').html($(result).find('tbody').html());
-                        // Cập nhật phân trang nếu cần
-                        $('#paginationContainer').html($(result).find('#paginationContainer').html());
-                    },
-                    error: function () {
-                        console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
-                    }
+                // Sự kiện thay đổi cho ô tìm kiếm
+                $('#txtMaHoaDon').on('input', function () {
+                    filterByMaHoaDon(); // Gọi hàm để lọc dữ liệu bằng Ajax
+                });
+
+                // Function để cập nhật giá trị lọc
+                function updateFilterValues() {
+                    var trangThai = $('#trangThai').val();
+                    var LoaiDhd = $('#LoaiDhd').val();
+                }
+
+                // Function để cập nhật dữ liệu và các liên kết phân trang
+                function updateData(pageNumber) {
+                    var trangThai = $('#trangThai').val();
+                    var LoaiDhd = $('#LoaiDhd').val();
+
+                    $.ajax({
+                        url: '/admin/dongho/DongHoDien',
+                        type: 'GET',
+                        data: { trangThai: trangThai, LoaiDhd: LoaiDhd, page: pageNumber },
+                        success: function (result) {
+                            $('#dh tbody').html($(result).find('tbody').html());
+                            $('#paginationContainerB').html($(result).find('#paginationContainerB').html());
+                        },
+                        error: function () {
+                            console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
+                        }
+                    });
+                }
+
+                // Biến toàn cục để lưu trữ ID của setTimeout
+                var timeoutId;
+
+                // Function để lọc dữ liệu bằng mã đồng hồ
+                function filterByMaHoaDon() {
+                    // Xóa timeout trước đó nếu có
+                    clearTimeout(timeoutId);
+
+                    // Lấy giá trị mã đồng hồ
+                    var maDongHo = $('#txtMaHoaDon').val();
+
+                    // Thiết lập timeout để gửi yêu cầu Ajax sau 500ms khi không có thêm ký tự mới được nhập vào
+                    timeoutId = setTimeout(function () {
+                        $.ajax({
+                            url: '/admin/dongho/DongHoDien',
+                            type: 'GET',
+                            data: { maDongHo: maDongHo, page: 1 },
+                            success: function (result) {
+                                $('#dh tbody').html($(result).find('tbody').html());
+                                $('#paginationContainerB').html($(result).find('#paginationContainerB').html());
+                            },
+                            error: function () {
+                                console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
+                            }
+                        });
+                    }, 500); // Chờ 500ms trước khi gửi yêu cầu Ajax
+                }
+
+
+                // Bind sự kiện cho các liên kết phân trang
+                $(document).on('click', '#paginationContainerB a', function (e) {
+                    e.preventDefault(); // Ngăn chặn hành vi mặc định của các liên kết phân trang
+                    var pageUrl = $(this).attr('href');
+                    var pageNumber = pageUrl.substring(pageUrl.indexOf('page=') + 5);
+                    updateData(pageNumber); // Gọi hàm để cập nhật dữ liệu khi người dùng chuyển trang
                 });
             });
-        });
-
-    </script>
-}
+        </script>
+    }

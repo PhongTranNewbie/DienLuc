@@ -26,7 +26,7 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("Danhsachdongho")]
         public IActionResult Index(int? page)
         {
-            int pageSize = 2;
+            int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var dongHoDiens = _context.DongHoDiens.Include(x => x.MaKhNavigation).AsNoTracking().OrderByDescending(x => x.MaDh);
             PagedList<DongHoDien> dhd = new PagedList<DongHoDien>(dongHoDiens, pageNumber, pageSize);
@@ -127,7 +127,7 @@ namespace DienLuc.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                
+
                 try
                 {
                     _context.Update(dongHoDien);
@@ -153,44 +153,27 @@ namespace DienLuc.Areas.Admin.Controllers
             return View(dongHoDien);
         }
 
-        // GET: admin/DongHoDiens/Delete/5
-        [HttpGet("Xoa/{id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var dongHoDien = await _context.DongHoDiens
-                .Include(d => d.MaKhNavigation)
-                .FirstOrDefaultAsync(m => m.MaDh == id);
-
-            if (dongHoDien == null)
-            {
-                return NotFound();
-            }
-
-            return View(dongHoDien);
-        }
+        
 
         // POST: admin/DongHoDiens/Delete/5
-        [HttpPost("Xoa/{id}")]
-        [ValidateAntiForgeryToken]
+        [HttpGet("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var dongHoDien = await _context.DongHoDiens.FindAsync(id);
             var existed = await _context.ChiTietSddiens.AnyAsync(c => c.MaDh == id);
             if (existed)
             {
-                ModelState.AddModelError(string.Empty, "Không thể xóa vì đã tồn tại trong chi tiết sử dụng điện");
-                return View("Delete", dongHoDien);
+                TempData["errorMessage"] = "Không thể xóa vì đã tồn tại trong chi tiết sử dụng điện";
+
+                return RedirectToAction("Index");
             }
             if (dongHoDien != null)
             {
                 _context.DongHoDiens.Remove(dongHoDien);
                 await _context.SaveChangesAsync();
                 TempData["successMessage"] = "Đã xóa đồng hồ điện thành công";
+                return RedirectToAction(nameof(Index));
+
             }
             TempData["errorMessage"] = "Đã xóa đồng hồ điện thất bại";
 
@@ -203,37 +186,40 @@ namespace DienLuc.Areas.Admin.Controllers
         }
 
         [HttpGet("DongHoDien")]
-        public IActionResult Filter(string trangThai, string LoaiDhd, int? page)
+        public IActionResult Filter(string trangThai, string LoaiDhd, string maDongHo, int? page)
         {
-            int pageSize = 12;
+            int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
 
-
-            IQueryable<DongHoDien> ct = _context.DongHoDiens.Include(x => x.MaKhNavigation);
+            // Lấy dữ liệu từ cơ sở dữ liệu
+            IQueryable<DongHoDien> dongHoData = _context.DongHoDiens.Include(x => x.MaKhNavigation);
 
             // Kiểm tra và lọc theo trạng thái nếu có giá trị truyền vào
-
-
-
-            // Kiểm tra và lọc theo mã khách hàng nếu có giá trị truyền vào
             if (!string.IsNullOrEmpty(trangThai))
             {
-                ct = ct.Where(h => h.TrangThai == trangThai);
+                dongHoData = dongHoData.Where(h => h.TrangThai == trangThai);
             }
 
-            // Kiểm tra và lọc theo mã khách hàng nếu có giá trị truyền vào
+            // Kiểm tra và lọc theo loại đồng hồ nếu có giá trị truyền vào
             if (!string.IsNullOrEmpty(LoaiDhd))
             {
-                ct = ct.Where(h => h.LoaiDhd == LoaiDhd);
+                dongHoData = dongHoData.Where(h => h.LoaiDhd == LoaiDhd);
             }
 
-            // Chuyển IQueryable sang List
-            var filteredData = ct.AsNoTracking().OrderByDescending(x => x.MaDh).ToList();
-            PagedList<DongHoDien> mhd = new PagedList<DongHoDien>(filteredData, pageNumber, pageSize);
-            // Truyền danh sách đồng hồ điện và danh sách khách hàng vào ViewBag để sử dụng trong PartialView
+            // Kiểm tra và lọc theo mã đồng hồ nếu có giá trị truyền vào
+            if (!string.IsNullOrEmpty(maDongHo))
+            {
+                dongHoData = dongHoData.Where(h => h.MaDh.Contains(maDongHo));
+            }
 
-            // Trả về PartialView chứa danh sách hóa đơn đã lọc
-            return View("Index", mhd);
+            // Sắp xếp theo MaDh giảm dần và chuyển sang danh sách không theo dõi
+            var filteredData = dongHoData.AsNoTracking().OrderByDescending(x => x.MaDh).AsNoTracking().ToList();
+
+            // Tạo đối tượng PagedList để phân trang
+            PagedList<DongHoDien> pagedData = new PagedList<DongHoDien>(filteredData, pageNumber, pageSize);
+
+            // Trả về view chứa danh sách đồng hồ đã lọc
+            return PartialView("Index", pagedData);
         }
     }
 }

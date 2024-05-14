@@ -26,13 +26,43 @@ namespace DienLuc.Areas.KhachHang.Controllers
             {
                 return RedirectToAction("Login");
             }
-            int pageSize = 12;
+            int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
-            var dH = _context.DongHoDiens.Where(x => x.MaKh == a.MaKh).AsNoTracking().OrderBy(x => x.MaDh);
+            var dH = _context.DongHoDiens.Include(x => x.MaKhNavigation).Where(x => x.MaKh == a.MaKh).AsNoTracking().OrderBy(x => x.MaDh);
             PagedList<DongHoDien> dhd = new PagedList<DongHoDien>(dH, pageNumber, pageSize);
             ViewBag.DongHo = dH;
             return View(dhd);
         }
-        
+        [HttpGet("DongHoDien")]
+        public IActionResult Filter(string maDongHo, int? page)
+        {
+            var userid = HttpContext.Session.GetString("MaTk");
+            var a = _context.KhachHangs.FirstOrDefault(x => x.Matk == userid);
+            if (userid == null)
+            {
+                return RedirectToAction("Login");
+            }
+            int pageSize = 3;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+
+            // Lấy dữ liệu từ cơ sở dữ liệu
+            IQueryable<DongHoDien> dongHoData = _context.DongHoDiens.Where(x => x.MaKh == a.MaKh).Include(x => x.MaKhNavigation);
+
+            // Kiểm tra và lọc theo mã đồng hồ nếu có giá trị truyền vào
+            if (!string.IsNullOrEmpty(maDongHo))
+            {
+                dongHoData = dongHoData.Where(h => h.MaDh.Contains(maDongHo));
+            }
+
+            // Sắp xếp theo MaDh giảm dần và chuyển sang danh sách không theo dõi
+            var filteredData = dongHoData.AsNoTracking().OrderByDescending(x => x.MaDh).AsNoTracking().ToList();
+
+            // Tạo đối tượng PagedList để phân trang
+            PagedList<DongHoDien> pagedData = new PagedList<DongHoDien>(filteredData, pageNumber, pageSize);
+
+            // Trả về view chứa danh sách đồng hồ đã lọc
+            return PartialView("Index", pagedData);
+        }
+
     }
 }

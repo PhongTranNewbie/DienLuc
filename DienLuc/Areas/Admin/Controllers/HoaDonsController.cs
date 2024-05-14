@@ -33,7 +33,7 @@ namespace DienLuc.Areas.Admin.Controllers
                 .AsNoTracking()
                 .OrderByDescending(x => x.MaHd)
                 .Include(h => h.MaChiTietSddienNavigation)
-                .Include(h => h.MaChiTietSddienNavigation.MaDhNavigation)
+                .Include(h => h.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation)
                 .Include(h => h.MaPtttoanNavigation)
                 .ToList(); // Lấy dữ liệu từ cơ sở dữ liệu và chuyển sang danh sách
 
@@ -145,8 +145,10 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("Tao")]
         public IActionResult Create()
         {
-
-            ViewData["MaChiTietSddien"] = new SelectList(_context.ChiTietSddiens, "Id", "Id");
+            var chiTietSddiens = _context.ChiTietSddiens
+                .OrderByDescending(c => c.NgayLayThongTin)
+                .ToList();
+            ViewData["MaChiTietSddien"] = new SelectList(chiTietSddiens, "Id", "Id");
 
             return View();
         }
@@ -367,7 +369,23 @@ namespace DienLuc.Areas.Admin.Controllers
                     hoaDon.SoNo = hoaDonMoiNhat.SoTienCanThanhToan - (hoaDonMoiNhat.SoTienDaThanhToan);
                 }
             }
+            // Tạo mã khách hàng mới
+            var maxMaHd = await _context.HoaDons.MaxAsync(kh => kh.MaHd);
+            string newMaNv;
 
+            // Kiểm tra xem maxMaKh có giá trị null không
+            if (maxMaHd == null)
+            {
+                // Nếu maxMaKh là null, gán mã khách hàng đầu tiên là "KH1"
+                newMaNv = "HD1";
+            }
+            else
+            {
+                // Nếu maxMaKh không phải null, tăng mã khách hàng lên một đơn vị và sử dụng nó cho mã khách hàng mới
+                int nextMaKhNumber = int.Parse(maxMaHd.Replace("HD", "")) + 1;
+                newMaNv = "HD" + nextMaKhNumber;
+            }
+            hoaDon.MaHd = newMaNv;
             _context.Add(hoaDon);
                 await _context.SaveChangesAsync();
             TempData["successMessage"] = "Đã tạo hóa đơn thành công";
@@ -379,7 +397,11 @@ namespace DienLuc.Areas.Admin.Controllers
         {
             ViewBag.MaDh = new SelectList(_context.DongHoDiens, "MaDh", "MaDh", hoaDon.MaChiTietSddienNavigation?.MaDh);
             ViewBag.MaNv = new SelectList(_context.NhanViens, "MaNv", "MaNv", hoaDon.MaNv);
-            ViewBag.MaChiTietSddien = new SelectList(_context.ChiTietSddiens, "Id", "Id", hoaDon.MaChiTietSddien);
+            var chiTietSddiens =  _context.ChiTietSddiens
+                    .OrderBy(c => c.Id)
+                    .ToList();
+
+            ViewBag.MaChiTietSddien = new SelectList(chiTietSddiens, "Id", "Id", hoaDon.MaChiTietSddien);
         }
 
 
@@ -463,34 +485,19 @@ namespace DienLuc.Areas.Admin.Controllers
             return View(hoaDon);
         }
 
-        // GET: HoaDons/Delete/5
-        [HttpGet("Xoa")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var hoaDon = await _context.HoaDons
-                .Include(h => h.MaChiTietSddienNavigation)
-                .Include(h => h.MaChiTietSddienNavigation.MaDhNavigation)
-                .Include(h => h.MaNvNavigation)
-                .FirstOrDefaultAsync(m => m.MaHd == id);
-            if (hoaDon == null)
-            {
-                return NotFound();
-            }
-
-            return View(hoaDon);
-        }
+       
 
         // POST: HoaDons/Delete/5
-        [HttpPost("Xoa/{id}")]
-        [ValidateAntiForgeryToken]
+        [HttpGet("Xoa/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var hoaDon = await _context.HoaDons.FindAsync(id);
+            var tb = _context.ThongBaos.Where(x => x.MaHd == id);
+            if(tb != null)
+            {
+                TempData["errorMessage"] = "Không thể xóa hóa đơn do đã có thông báo cho hóa đơn này.";
+                return RedirectToAction(nameof(Index));
+            }
             if (hoaDon != null)
             {
                 _context.HoaDons.Remove(hoaDon);
@@ -507,7 +514,7 @@ namespace DienLuc.Areas.Admin.Controllers
         }
 
         [HttpGet("LocChiTietHD")]
-        public IActionResult FilterHoaDon(string trangThai, string maDh, string maKh, DateTime? fromDate, DateTime? toDate, int? page)
+        public IActionResult FilterHoaDon(string trangThai, DateTime? fromDate, DateTime? toDate, int? page, string maHoaDon)
         {
             int pageSize = 2;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
@@ -520,18 +527,6 @@ namespace DienLuc.Areas.Admin.Controllers
                 hoaDons = hoaDons.Where(h => h.TrangThai == trangThai);
             }
 
-            // Kiểm tra và lọc theo mã đồng hồ nếu có giá trị truyền vào
-            if (!string.IsNullOrEmpty(maDh))
-            {
-                hoaDons = hoaDons.Where(h => h.MaChiTietSddienNavigation.MaDh == maDh);
-            }
-
-            // Kiểm tra và lọc theo mã khách hàng nếu có giá trị truyền vào
-            if (!string.IsNullOrEmpty(maKh))
-            {
-                hoaDons = hoaDons.Where(h => h.MaChiTietSddienNavigation.MaDhNavigation.MaKh == maKh);
-            }
-
             // Kiểm tra và lọc theo ngày nếu có giá trị truyền vào
             if (fromDate != null)
             {
@@ -540,6 +535,12 @@ namespace DienLuc.Areas.Admin.Controllers
             if (toDate != null)
             {
                 hoaDons = hoaDons.Where(h => h.NgayTao.Date <= toDate.Value.Date);
+            }
+
+            // Kiểm tra và lọc theo Mã hóa đơn nếu có giá trị truyền vào
+            if (!string.IsNullOrEmpty(maHoaDon))
+            {
+                hoaDons = hoaDons.Where(h => h.MaHd.Contains(maHoaDon));
             }
 
             // Chuyển IQueryable sang List
@@ -559,11 +560,12 @@ namespace DienLuc.Areas.Admin.Controllers
 
             PagedList<HoaDon> mhd = new PagedList<HoaDon>(filteredData, pageNumber, pageSize);
             // Truyền danh sách đồng hồ điện và danh sách khách hàng vào ViewBag để sử dụng trong PartialView
-            
+
 
             // Trả về PartialView chứa danh sách hóa đơn đã lọc
             return PartialView("Index", mhd);
         }
+
 
 
 

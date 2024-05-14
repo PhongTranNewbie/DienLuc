@@ -7,24 +7,14 @@
     var dongHoDienList = ViewBag.DHD as List<DienLuc.Models.DongHoDien>;
 
 }
-<div class="row">
-    <div class="col-md-4">
-        <div class="form-group">
-            <label for="maDh">Mã đồng hồ:</label>
-            <select id="maDh" class="form-control">
-                <option value="">Tất cả</option>
-                @foreach (var dongHo in dongHoDienList)
-                {
-                    <option value="@dongHo.MaDh">@dongHo.MaDh</option>
-                }
-            </select>
-        </div>
-    </div>
-</div>
+
 <h1>Danh sách hóa đơn</h1>
 <table id="dhd" class="table">
     <thead>
         <tr class="table-warning">
+            <th>
+                Mã hóa đơn
+            </th>
             <th>
                 Ngày tạo
             </th>
@@ -40,28 +30,38 @@
             <th>
                 Chỉ số mới
             </th>
-
+            <th>
+                Chỉ số tiêu thụ
+            </th>
+            <th>
+                Thuế
+            </th>
+            <th>
+                Số nợ
+            </th>
             <th>
                 Số tiền cần thanh toán
             </th>
             <th>
                 Số tiền đã thanh toán
             </th>
+
             <th>
                 Mã đồng hồ
             </th>
             <th>
-                Mã khách hàng
+                Trạng thái
             </th>
-            <th></th>
+
         </tr>
     </thead>
     <tbody>
         @{
             int i = 0;
+            int j = 0;
             string @cls = "table-success";
         }
-        @foreach (var item in Model)
+        @foreach (var hoaDon in Model)
         {
             i = i + 1;
             cls = "table-success";
@@ -71,77 +71,103 @@
             }
             <tr class="@cls">
                 <td>
-                    @Html.DisplayFor(modelItem => item.NgayTao)
+                    @Html.DisplayFor(modelItem => hoaDon.MaHd)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.NgayDenHan)
+                    @Html.DisplayFor(modelItem => hoaDon.NgayTao)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.NgayThanhToan)
+                    @Html.DisplayFor(modelItem => hoaDon.NgayDenHan)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ChiSoCu)
+                    @Html.DisplayFor(modelItem => hoaDon.NgayThanhToan)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ChiSoMoi)
+                    @Html.DisplayFor(modelItem => hoaDon.ChiSoCu)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => hoaDon.ChiSoMoi)
+                </td>
+                <td>
+                    @(hoaDon.ChiSoMoi - hoaDon.ChiSoCu)
+                </td>
+                <td>
+                    @if (j < ViewBag.ListThue.Count) // Kiểm tra chỉ mục trước khi truy cập
+                    {
+
+                        @string.Format("{0:N0}", ViewBag.ListThue[j])
+                        j++;
+                    }
+                </td>
+                <td>
+                    @string.Format("{0:N0}", hoaDon.SoNo)
+                </td>
+                <td>
+                    @string.Format("{0:N0}", hoaDon.SoTienCanThanhToan)
+                </td>
+                <td>
+                    @string.Format("{0:N0}", hoaDon.SoTienDaThanhToan)
                 </td>
 
                 <td>
-                    @string.Format("{0:N0}", item.SoTienCanThanhToan)
+                    @Html.DisplayFor(modelItem => hoaDon.MaChiTietSddienNavigation.MaDh)
                 </td>
                 <td>
-                    @string.Format("{0:N0}", item.SoTienDaThanhToan)
+                    @Html.DisplayFor(modelItem => hoaDon.TrangThai)
                 </td>
-
-                <td>
-                    @Html.DisplayFor(modelItem => item.MaChiTietSddienNavigation.MaDh)
-                </td>
-
-                <td>
-
-                    @Html.DisplayFor(modelItem => item.MaChiTietSddienNavigation.MaDhNavigation.MaKh)
-
-                </td>
-
-
-
-                
             </tr>
         }
     </tbody>
 </table>
-@Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
+<div class="center" id="paginationContainer1b">
+    @Html.PagedListPager(Model, page => Url.Action("HDDaThanhToan", new { page = page }), new PagedListRenderOptions
 {
     LiElementClasses = new string[] { "page-item" },
     PageClasses = new string[] { "page-link" }
 })
+</div>
 @section Scripts {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        $(document).ready(function () {
-            $('#maDh').change(function () {
 
-                var maDh = $('#maDh').val();
+        // Biến toàn cục để lưu trữ ID của setTimeout
+        var timeoutId;
 
+        // Function để lọc dữ liệu bằng mã đồng hồ
+        function filterByMaHoaDon() {
+            // Xóa timeout trước đó nếu có
+            clearTimeout(timeoutId);
 
+            // Lấy giá trị mã đồng hồ
+            var mahd = $('#txtMaHoaDon').val();
+
+            // Thiết lập timeout để gửi yêu cầu Ajax sau 500ms khi không có thêm ký tự mới được nhập vào
+            timeoutId = setTimeout(function () {
                 $.ajax({
-                    url: '/admin/thanhtoan/DongHoDien',
+                    url: '/khachhang/thanhtoan/DongHoDienDTT',
                     type: 'GET',
-                    data: { maDh: maDh },
+                    data: { mahd: mahd, page: 1 },
                     success: function (result) {
                         $('#dhd tbody').html($(result).find('tbody').html());
-                        // Cập nhật phân trang nếu cần
-                        $('#paginationContainer').html($(result).find('#paginationContainer').html());
+                                $('#paginationContainer1b').html($(result).find('#paginationContainer1b').html());
                     },
                     error: function () {
                         console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
                     }
                 });
-            });
-        });
+            }, 500); // Chờ 500ms trước khi gửi yêu cầu Ajax
+        }
 
+
+        // Bind sự kiện cho các liên kết phân trang
+        $(document).on('click', '#paginationContainer1b a', function (e) {
+            e.preventDefault(); // Ngăn chặn hành vi mặc định của các liên kết phân trang
+            var pageUrl = $(this).attr('href');
+            var pageNumber = pageUrl.substring(pageUrl.indexOf('page=') + 5);
+            updateData(pageNumber); // Gọi hàm để cập nhật dữ liệu khi người dùng chuyển trang
+        });
     </script>
 }

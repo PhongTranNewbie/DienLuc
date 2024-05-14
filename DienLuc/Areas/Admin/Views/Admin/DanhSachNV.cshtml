@@ -22,7 +22,7 @@
             <th>Vị trí</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="dd">
         @{
             int i = 0;
             string @cls = "table-success";
@@ -43,14 +43,82 @@
                 <td>@item.DiaChi</td>
                 <td>@item.SoDt</td>
                 <td>@item.MatkNavigation?.MaTk</td>
-                <td>@item.VaiTroNavigation?.ViTri</td>
+                <td>@item.VaiTroNavigation.ViTri</td>
             </tr>
         }
     </tbody>
 </table>
-
+<div class="center" id="paginationContainerC">
 @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
 {
     LiElementClasses = new string[] { "page-item" },
     PageClasses = new string[] { "page-link" }
 })
+</div>
+@section Scripts {
+    <script>
+        function filterByMaHoaDon() {
+            var maNhanVien = $('#txtMaHoaDon').val(); // Lấy giá trị mã nhân viên
+
+            $.ajax({
+                url: '/admin/taikhoanad/FilterByMaNhanVien', // Đường dẫn đến action trong controller để xử lý yêu cầu
+                type: 'GET',
+                data: { maNhanVien: maNhanVien },
+                success: function (result) {
+                    // Cập nhật từng cell trong bảng
+                    var tableRows = $(result).find('tbody tr');
+                    $('#dd').empty(); // Xóa hết dữ liệu cũ
+
+                    // Thêm dữ liệu mới vào bảng
+                    $.each(tableRows, function (index, row) {
+                        $('#dd').append(row);
+                    });
+
+                    // Cập nhật nội dung của phần tử HTML mà bạn muốn hiển thị dữ liệu
+                    $('#paginationContainerC').html($(result).find('#paginationContainerC').html());
+                },
+                error: function () {
+                    console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
+                }
+            });
+        }
+
+
+
+        // Function để xử lý chuyển trang
+        function updateData(pageNumber) {
+            var maNhanVien = $('#txtMaHoaDon').val(); // Lấy giá trị mã nhân viên
+
+            $.ajax({
+                url: '/admin/taikhoanad/FilterByMaNhanVien', // Đường dẫn đến action trong controller để xử lý yêu cầu
+                type: 'GET',
+                data: { maNhanVien: maNhanVien, page: pageNumber }, // Truyền thêm số trang
+                success: function (result) {
+                    // Cập nhật từng cell trong bảng
+                    var tableRows = $(result).find('tbody tr');
+                    $('#dd').empty(); // Xóa hết dữ liệu cũ
+
+                    // Thêm dữ liệu mới vào bảng
+                    $.each(tableRows, function (index, row) {
+                        $('#dd').append(row);
+                    });
+
+                    // Cập nhật nội dung của phần tử HTML mà bạn muốn hiển thị dữ liệu
+                    $('#paginationContainerC').html($(result).find('#paginationContainerC').html());
+                },
+                error: function () {
+                    console.log('Đã xảy ra lỗi khi lấy dữ liệu từ máy chủ.');
+                }
+            });
+        }
+
+        // Bind sự kiện cho các liên kết phân trang
+        $(document).on('click', '#paginationContainerC a', function (e) {
+            e.preventDefault(); // Ngăn chặn hành vi mặc định của các liên kết phân trang
+            var pageUrl = $(this).attr('href');
+            var pageNumber = pageUrl.substring(pageUrl.indexOf('page=') + 5);
+            updateData(pageNumber); // Gọi hàm để cập nhật dữ liệu khi người dùng chuyển trang
+        });
+
+    </script>
+}

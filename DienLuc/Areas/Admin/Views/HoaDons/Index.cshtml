@@ -7,37 +7,35 @@
 
 }
 <div class="row">
-    <div class="col-md-3">
-        <div class="input-group">
-            <input type="text" id="my_date_picker" class="form-control" placeholder="Từ ngày">
-            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-        </div>
+<div class="col-md-3">
+    <div class="input-group">
+        <input type="text" id="my_date_picker" class="form-control" placeholder="Từ ngày" oninput="filterByDateHD(1)">
+        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
     </div>
-    <div class="col-md-3">
-        <div class="input-group">
-            <input type="text" id="my_date_picker1" class="form-control" placeholder="Đến ngày">
-            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="input-group">
-            <select id="trangThai" class="form-select custom-select">
-                <option value="">Tất cả</option>
-                <option value="Đã thanh toán">Đã thanh toán</option>
-                <option value="Chưa thanh toán">Chưa thanh toán</option>
-            </select>
+</div>
 
-        </div>
+<div class="col-md-3">
+    <div class="input-group">
+        <input type="text" id="my_date_picker1" class="form-control" placeholder="Đến ngày" oninput="filterByDateHD(1)">
+        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
     </div>
-    <div class="col-md-3">
-        <button class="btn btn-primary" onclick="filterByDateHD(1)">Lọc</button>
+</div>
+
+<div class="col-md-3">
+    <div class="input-group">
+        <select id="trangThai" class="form-select custom-select" onchange="filterByDateHD(1)">
+            <option value="">Tất cả</option>
+            <option value="Đã thanh toán">Đã thanh toán</option>
+            <option value="Chưa thanh toán">Chưa thanh toán</option>
+        </select>
     </div>
+</div>
 </div>
 
 <h1>Danh sách hóa đơn</h1>
 
 <p>
-    <a class="btn btn-primary" asp-action="Create">Thêm mới</a>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i></a>
 </p>
 
 <table id="hoaDonTable" class="table">
@@ -88,6 +86,9 @@
             <th>
                 Mã khách hàng
             </th>
+            <th>
+                Họ và tên
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -130,13 +131,13 @@
                     @(item.ChiSoMoi - item.ChiSoCu)
                 </td>
                 <td>
-                    @if (j < ViewBag.ListThue.Count) // Kiểm tra chỉ mục trước khi truy cập
+                    @if (ViewBag.ListThue != null && j < ViewBag.ListThue.Count) // Kiểm tra ViewBag.ListThue có tồn tại và không trống
                     {
-
                         @string.Format("{0:N0}", ViewBag.ListThue[j])
                         j++;
                     }
                 </td>
+
                 <td>
                     @string.Format("{0:N0}", item.SoNo)
                 </td>
@@ -160,20 +161,35 @@
                     @Html.DisplayFor(modelItem => item.MaChiTietSddienNavigation.MaDhNavigation.MaKh)
                         
                 </td>
+                <td>
 
+                    @Html.DisplayFor(modelItem => item.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation.Ho) @Html.DisplayFor(modelItem => item.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation.Ten)
+
+                </td>
                 
 
                 <td>
-                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.MaHd">Chỉnh sửa</a> |
-                    <a class="btn btn-primary" asp-action="Details" asp-route-id="@item.MaHd">Chi tiết</a> |
-                    <a class="btn btn-primary" asp-action="Delete" asp-route-id="@item.MaHd">Xóa</a>
+                    
+                    <a class="btn btn-danger btn-sm rounded" asp-action="Edit" asp-route-id="@item.MaHd">
+                        <i class="bi bi-pencil"></i>
+                    </a> |
+
+                    <a onclick="if (confirm('Xác nhận xóa hóa đơn này hay không?') == true)
+                        {location.href='/admin/Hoadon/Xoa/@item.MaHd'}" class="btn btn-danger btn-sm rounded">
+                        <i class="bi bi-x-circle"></i>
+                    </a> |
+                    @if (item.TrangThai == "Chưa thanh toán")
+                    {   
+                        <a class="btn btn-danger btn-sm rounded" asp-controller="HomeAdmin" asp-action="ThanhToan" asp-route-maHd="@item.MaHd"><i class="bi bi-cash"></i></a>
+
+                    }
                 </td>
             </tr>
             
         }
     </tbody>
 </table>
-<div id="paginationContainerA">
+<div class="center" id="paginationContainerA">
     @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions
 {
     LiElementClasses = new string[] { "page-item" },
@@ -186,11 +202,14 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="~/Scripts/datepicker-vi.js"></script>
     <script>
         jQuery(document).ready(function ($) {
-            // Initialize Datepickers
-            $('#my_date_picker').datepicker();
-            $('#my_date_picker1').datepicker();
+            $("#my_date_picker, #my_date_picker1").datepicker({
+                dateFormat: "yy-mm-dd",
+                changeMonth: true,
+                changeYear: true
+            });
 
             // Bind event handler for changing trạng thái
             $('#trangThai').change(function () {
@@ -206,11 +225,6 @@
             updateFilterValues();
         });
 
-        // Define variables to store filter values
-        var fromDate = "";
-        var toDate = "";
-        var trangThai = "";
-
         // Function to update filter values
         function updateFilterValues() {
             fromDate = $('#my_date_picker').val();
@@ -225,26 +239,45 @@
         function updatePaginationLinks(pageNumber) {
             // Update URL for pagination links including fromDate, toDate, and trangThai parameters
             var url = '/admin/Hoadon/LocChiTietHD?page=' + pageNumber + '&fromDate=' + fromDate + '&toDate=' + toDate + '&trangThai=' + trangThai;
-            return url;
+            $.get(url, function (data) {
+                $('#hoaDonTable').html($(data).find('#hoaDonTable').html());
+                $('#paginationContainerA').html($(data).find('#paginationContainerA').html());
+            });
         }
 
         // Bind event handler for pagination links
         $(document).on('click', '#paginationContainerA a', function (e) {
             e.preventDefault(); // Prevent default behavior of the pagination links
             var pageUrl = $(this).attr('href');
-            $.get(pageUrl, function (data) {
-                // Update the table content and pagination links with the received data
-                $('#hoaDonTable').html($(data).find('#hoaDonTable').html());
-                $('#paginationContainerA').html($(data).find('#paginationContainerA').html());
-
-                // Trigger filter function with the current page number
-                filterByDateHD(pageUrl.substring(pageUrl.indexOf('page=') + 5));
-            });
+            var pageNumber = pageUrl.substring(pageUrl.indexOf('page=') + 5);
+            updatePaginationLinks(pageNumber);
         });
+
+        // Function to filter by Mã hóa đơn
+        function filterByMaHoaDon() {
+            var maHoaDon = $('#txtMaHoaDon').val();
+            $.ajax({
+                url: '/admin/Hoadon/LocChiTietHD',
+                type: 'GET',
+                data: {
+                    maHoaDon: maHoaDon,
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    trangThai: trangThai,
+                    page: 1
+                },
+                success: function (data) {
+                    $('#hoaDonTable').html($(data).find('#hoaDonTable').html());
+                    $('#paginationContainerA').html($(data).find('#paginationContainerA').html());
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
 
         // Function to filter by date
         function filterByDateHD(pageNumber) {
-            // Send an AJAX request to the LocChiTiet action in the controller
             $.ajax({
                 url: '/admin/Hoadon/LocChiTietHD',
                 type: 'GET',
@@ -255,7 +288,6 @@
                     page: pageNumber
                 },
                 success: function (data) {
-                    // Update the table content and pagination links with the received data
                     $('#hoaDonTable').html($(data).find('#hoaDonTable').html());
                     $('#paginationContainerA').html($(data).find('#paginationContainerA').html());
                 },
@@ -264,6 +296,7 @@
                 }
             });
         }
+
     </script>
 }
 

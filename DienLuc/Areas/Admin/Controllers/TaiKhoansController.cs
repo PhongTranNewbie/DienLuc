@@ -55,17 +55,30 @@ namespace DienLuc.Areas.Admin.Controllers
 
                     return View(viewModel);
                 }
-
-                // Tạo tài khoản
-                var taiKhoan = new TaiKhoan
+                if(viewModel.VaiTro == "VT1")
                 {
-                    MaTk = viewModel.MaTk,
-                    Mk = viewModel.Mk,
-                    LoaiTk = "TK2" // Loại tài khoản nhân viên
-                };
+                    // Tạo tài khoản
+                    var taiKhoan = new TaiKhoan
+                    {
+                        MaTk = viewModel.MaTk,
+                        Mk = viewModel.Mk,
+                        LoaiTk = "TK1" // Loại tài khoản nhân viên
 
-                _context.TaiKhoans.Add(taiKhoan);
-                await _context.SaveChangesAsync();
+                    };
+                    _context.TaiKhoans.Add(taiKhoan);
+                    await _context.SaveChangesAsync();
+                } else
+                {
+                    // Tạo tài khoản
+                    var taiKhoan = new TaiKhoan
+                    {
+                        MaTk = viewModel.MaTk,
+                        Mk = viewModel.Mk,
+                        LoaiTk = "TK2" // Loại tài khoản nhân viên
+                    };
+                    _context.TaiKhoans.Add(taiKhoan);
+                    await _context.SaveChangesAsync();
+                }
                 // Tạo mã khách hàng mới
                 var maxMaNv = await _context.NhanViens.MaxAsync(kh => kh.MaNv);
                 string newMaNv;
@@ -101,7 +114,7 @@ namespace DienLuc.Areas.Admin.Controllers
                 _context.NhanViens.Add(newNhanVien);
                 await _context.SaveChangesAsync();
                 TempData["successMessage"] = "Đã tạo nhân viên thành công";
-                return RedirectToAction("Index", "DongHoDiens");
+                return RedirectToAction("DanhSachNV", "Admin");
             }
             ViewData["VaiTro"] = new SelectList(_context.VaiTros, "MaVaiTro", "ViTri");
             TempData["errorMessage"] = "Đã tạo nhân viên thất bại";
@@ -188,8 +201,7 @@ namespace DienLuc.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChinhSuaThongTin(NhanVien model)
         {
-            if (ModelState.IsValid)
-            {
+            
                 var userId = HttpContext.Session.GetString("MaTk");
                 if (userId != null)
                 {
@@ -207,14 +219,15 @@ namespace DienLuc.Areas.Admin.Controllers
                         // Lưu thay đổi vào cơ sở dữ liệu
                         _context.NhanViens.Update(nhanVien);
                         await _context.SaveChangesAsync();
+                        TempData["successMessage"] = "Đã chỉnh sửa thông tin thành công";
 
-                        return RedirectToAction("ThongTinNV");
+                    return RedirectToAction("ThongTinNV");
                     }
                 }
-            }
+            
 
             // Nếu ModelState không hợp lệ, quay lại view chỉnh sửa với dữ liệu hiện tại
-            return View(model);
+            return RedirectToAction("Login", "Admin");
         }
 
 

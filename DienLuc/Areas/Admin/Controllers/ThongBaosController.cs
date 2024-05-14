@@ -28,10 +28,14 @@ namespace DienLuc.Areas.Admin.Controllers
         // GET: ThongBaos
         [HttpGet("")]
         [HttpGet("DanhSachThongBao")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page)
         {
-            var dienLucContext = _context.ThongBaos.Include(t => t.MaHdNavigation);
-            return View(await dienLucContext.ToListAsync());
+            int pageSize = 3;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+            var dienLucContext = _context.ThongBaos.AsNoTracking().Include(t => t.MaHdNavigation).ToList();
+            PagedList<ThongBao> ct = new PagedList<ThongBao>(dienLucContext, pageNumber, pageSize);
+
+            return View(ct);
         }
 
         // GET: ThongBaos/Details/5
@@ -106,6 +110,37 @@ namespace DienLuc.Areas.Admin.Controllers
         private bool ThongBaoExists(int id)
         {
             return _context.ThongBaos.Any(e => e.Id == id);
+        }
+
+        [HttpGet("LocChiTiet")]
+        public IActionResult LocTheoNgay(string maCT, int? page)
+        {
+            int pageSize = 2;
+            int pageNumber = page == null || page < 0 ? 1 : page.Value;
+            ViewData["pageNumber"] = pageNumber;
+
+            // Truy vấn cơ sở dữ liệu để lấy dữ liệu trong khoảng thời gian từ fromDate đến toDate
+            var query = _context.ThongBaos.Include(x => x.MaHdNavigation).AsQueryable();
+
+            if (!string.IsNullOrEmpty(maCT))
+            {
+                // Tìm kiếm theo MaHd
+                query = query.Where(x => x.MaHd.Contains(maCT));
+            }
+
+
+
+            // Sắp xếp và lấy dữ liệu
+            var chiTietSdDienList = query
+                .AsNoTracking()
+                .OrderByDescending(x => x.Id)
+                .ToList();
+
+            // Phân trang dữ liệu
+            PagedList<ThongBao> ct = new PagedList<ThongBao>(chiTietSdDienList, pageNumber, pageSize);
+
+            // Trả về PartialView với dữ liệu đã lọc và phân trang
+            return PartialView("Index", ct);
         }
     }
 }
