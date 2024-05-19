@@ -1,0 +1,93 @@
+﻿@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Theo dõi doanh thu tháng";
+}
+
+<div class="container">
+    <h2>Theo dõi doanh thu tháng</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post" action="@Url.Action("DoanhThuThang", "DoanhThu")">
+                <div class="form-group">
+                    <label for="startdate">Từ ngày:</label>
+                    <div class="input-group">
+                        <input type="text" id="startdate" class="form-control" name="startdate">
+                        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="enddate">Đến ngày:</label>
+                    <div class="input-group">
+                        <input type="text" id="enddate" class="form-control" name="enddate">
+                        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-calculator"></i></button>
+            </form>
+        </div>
+    </div>
+    <hr />
+    @if (ViewBag.HoaDons != null)
+    {
+        <div id="results">
+            <div class="row">
+                <div class="col-md-12">
+                    <canvas id="hoaDonChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="~/Scripts/datepicker-vi.js"></script>
+
+<script>
+    jQuery(document).ready(function ($) {
+        $("#startdate, #enddate").datepicker({
+            dateFormat: "yy-mm-dd",
+            changeMonth: true,
+            changeYear: true
+        });
+
+        var chartData = @Html.Raw(Json.Serialize(ViewBag.ChartData));
+        if (chartData) {
+            renderChart(chartData);
+        }
+    });
+
+    function renderChart(chartData) {
+        var ctx = document.getElementById('hoaDonChart').getContext('2d');
+        if (chartData.data.some(count => count > 0)) {
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Số lượng hóa đơn',
+                        data: chartData.data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        } else {
+            // Hiển thị thông báo hoặc xử lý khác khi không có dữ liệu để vẽ biểu đồ
+            console.log("Không có dữ liệu để vẽ biểu đồ.");
+        }
+    }
+</script>

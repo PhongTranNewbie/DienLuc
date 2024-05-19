@@ -140,18 +140,33 @@
             <ul class="nav">
                 
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic-dongho" aria-expanded="false" aria-controls="ui-basic-dongho">
                         <span class="menu-title">Đồng hồ</span>
                         <i class="menu-arrow"></i>
                         <i class="mdi mdi-crosshairs-gps menu-icon"></i>
                     </a>
-                    <div class="collapse" id="ui-basic">
+                    <div class="collapse" id="ui-basic-dongho">
                         <ul class="nav flex-column sub-menu">
                             <li class="nav-item"> <a class="nav-link" href="/admin/DanhsachSDDien">Chi tiết sử dụng điện</a></li>
                             <li class="nav-item"> <a class="nav-link" href="/admin/Danhsachdongho">Thông tin đồng hồ</a></li>
                         </ul>
                     </div>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic-thongke" aria-expanded="false" aria-controls="ui-basic-thongke">
+                        <span class="menu-title">Thống kê</span>
+                        <i class="menu-arrow"></i>
+                        <i class="mdi mdi-crosshairs-gps menu-icon"></i>
+                    </a>
+                    <div class="collapse" id="ui-basic-thongke">
+                        <ul class="nav flex-column sub-menu">
+                            <li class="nav-item"> <a class="nav-link" href="/admin/DoanhThu">Doanh thu từng hóa đơn</a></li>
+                            <li class="nav-item"> <a class="nav-link" href="/admin/DoanhThu/doanhthuthang">Doanh thu theo tháng</a></li>
+                            <li class="nav-item"> <a class="nav-link" href="/admin/DoanhThu/lietke">Thống kê số lượng hóa đơn</a></li>
+                        </ul>
+                    </div>
+                </li>
+
                 @if (HttpContextAccessor.HttpContext.Session.GetString("Role") != null 
                 && HttpContextAccessor.HttpContext.Session.GetString("Role") == "TK1")
                 {
@@ -190,13 +205,7 @@
                     </a>
 
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/DoanhThu">
-                        <span class="menu-title">Doanh thu</span>
-                        <i class="bi bi-coin custom-bootstrap-icon"></i>
-                    </a>
-
-                </li>
+                
             </ul>
         </nav>
         <!-- partial -->
