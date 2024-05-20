@@ -19,7 +19,14 @@ namespace DienLuc.Areas.Admin.Controllers
 		[HttpGet("DanhSachLoaiTK")]
 		public IActionResult ListAccount()
 		{
-			var role = _context.LoaiTaiKhoans.ToList();
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
+            var role = _context.LoaiTaiKhoans.ToList();
 			return View(role);
 		}
 		[HttpGet("ThemLoaiTK")]
@@ -65,6 +72,13 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("DanhSachVaiTro")]
         public IActionResult ListRole()
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             var role = _context.VaiTros.ToList();
             return View(role);
         }
@@ -110,17 +124,26 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("DanhSachPT")]
         public IActionResult DanhSachTT()
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             var role = _context.PhuongThucThanhToans.ToList();
             return View(role);
         }
         [HttpGet("ThemPTTT")]
         public IActionResult PTTT()
         {
-            /*var userid = HttpContext.Session.GetString("MaTk");
-            if (userid == null)
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
             {
-                return NotFound();
-            }*/
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             return View();
         }
         [HttpPost("ThemPTTT")]

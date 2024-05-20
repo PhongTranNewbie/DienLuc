@@ -15,6 +15,13 @@ namespace DienLuc.Areas.KhachHang.Controllers
         [HttpGet("TinhTienDien")]
         public IActionResult TienDien()
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "TaiKhoan"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             return View();
         }
         [HttpPost("TinhTienDien")]

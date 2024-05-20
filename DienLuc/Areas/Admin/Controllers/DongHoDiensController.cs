@@ -26,6 +26,13 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("Danhsachdongho")]
         public IActionResult Index(int? page)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var dongHoDiens = _context.DongHoDiens.Include(x => x.MaKhNavigation).AsNoTracking().OrderByDescending(x => x.MaDh);
@@ -33,31 +40,19 @@ namespace DienLuc.Areas.Admin.Controllers
             return View(dhd);
         }
 
-        // GET: admin/DongHoDiens/Details/5
-        [HttpGet("chitiet/{id}")]
-        public async Task<IActionResult> Details(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var dongHoDien = await _context.DongHoDiens
-                .Include(d => d.MaKhNavigation)
-                .FirstOrDefaultAsync(m => m.MaDh == id);
-
-            if (dongHoDien == null)
-            {
-                return NotFound();
-            }
-
-            return View(dongHoDien);
-        }
+        
 
         // GET: admin/DongHoDiens/Create
         [HttpGet("themmoi")]
         public IActionResult Create()
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             ViewData["MaKh"] = new SelectList(_context.KhachHangs, "MaKh", "MaKh");
             return View();
         }
@@ -100,6 +95,13 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("chinhsua/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             if (id == null)
             {
                 return NotFound();

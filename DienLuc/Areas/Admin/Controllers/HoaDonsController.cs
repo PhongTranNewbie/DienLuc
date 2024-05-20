@@ -27,6 +27,13 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("Danhsachhoadon")]
         public IActionResult Index(int? page)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             int pageSize = 2;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var hoadon = _context.HoaDons
@@ -109,28 +116,7 @@ namespace DienLuc.Areas.Admin.Controllers
 
 
 
-        // GET: HoaDons/Details/5
-        [HttpGet("ChiTiet/{id}")]
-        public async Task<IActionResult> Details(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var hoaDon = await _context.HoaDons
-                .Include(h => h.MaChiTietSddienNavigation)
-                .Include(h => h.MaChiTietSddienNavigation.MaDhNavigation)
-                .Include(h => h.MaNvNavigation)
-                .Include(h => h.MaPtttoanNavigation)
-                .FirstOrDefaultAsync(m => m.MaHd == id);
-            if (hoaDon == null)
-            {
-                return NotFound();
-            }
-
-            return View(hoaDon);
-        }
+       
         [HttpGet]
         public IActionResult GetChiSoCu(string maDh)
         {
@@ -145,6 +131,13 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("Tao")]
         public IActionResult Create()
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             var chiTietSddiens = _context.ChiTietSddiens
                 .OrderByDescending(c => c.NgayLayThongTin)
                 .ToList();
@@ -293,7 +286,7 @@ namespace DienLuc.Areas.Admin.Controllers
             if (userId == null)
             {
                 // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
-                return RedirectToAction("Login", "AccountEmployee"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
             }
             var exist = await _context.HoaDons
                 .Include(h => h.MaChiTietSddienNavigation)
@@ -453,6 +446,13 @@ namespace DienLuc.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("MaHd,MaNv,MaKh,MaChiTietSddien,NgayTao,NgayDenHan,NgayThanhToan,SoNo,SoTienCanThanhToan,SoTienDaThanhToan,MaPtttoan,TrangThai,ChiSoCu,ChiSoMoi")] HoaDon hoaDon)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             if (id != hoaDon.MaHd)
             {
                 return NotFound();
@@ -516,6 +516,13 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("LocChiTietHD")]
         public IActionResult FilterHoaDon(string trangThai, DateTime? fromDate, DateTime? toDate, int? page, string maHoaDon)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             int pageSize = 2;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
 

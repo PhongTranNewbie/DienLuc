@@ -16,6 +16,13 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("")]
         public IActionResult Index()
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             return View();
         }
         [HttpPost("")]
@@ -48,6 +55,13 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("LietKe")]
         public IActionResult LietKe()
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             return View();
         }
 
@@ -101,6 +115,13 @@ namespace DienLuc.Areas.Admin.Controllers
         [HttpGet("DoanhThuThang")]
         public IActionResult DoanhThuThang()
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             return View();
         }
 

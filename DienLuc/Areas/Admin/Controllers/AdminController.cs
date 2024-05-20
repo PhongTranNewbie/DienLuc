@@ -83,6 +83,13 @@ namespace Dienluc.Areas.Admin.Controllers
         [HttpGet("DanhSachNV")]
         public IActionResult DanhSachNV(int? page)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var lnv = _db.NhanViens.AsNoTracking().OrderByDescending(x => x.MaNv).Include(c => c.MatkNavigation).Include(c => c.VaiTroNavigation);
@@ -94,6 +101,13 @@ namespace Dienluc.Areas.Admin.Controllers
         [HttpGet("DanhSachKH")]
         public IActionResult DanhSachKH(int? page)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var lnv = _db.KhachHangs.AsNoTracking().OrderByDescending(x => x.MaKh).Include(c => c.MatkNavigation);
@@ -104,6 +118,13 @@ namespace Dienluc.Areas.Admin.Controllers
         [HttpGet("FilterByMaNhanVien")]
         public IActionResult Filter(string maNhanVien, int? page)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
 
@@ -133,6 +154,13 @@ namespace Dienluc.Areas.Admin.Controllers
         [HttpGet("FilterByMaKH")]
         public IActionResult FilterKH(string maNhanVien, int? page)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "Admin"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             int pageSize = 3;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
 

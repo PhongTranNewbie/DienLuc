@@ -20,6 +20,13 @@ namespace DienLuc.Areas.KhachHang.Controllers
         [Route("danhsachdongho")]
         public IActionResult Index(int? page)
         {
+            var userId = HttpContext.Session.GetString("MaTk");
+
+            if (userId == null)
+            {
+                // Nếu không tìm thấy mã tài khoản, chuyển hướng đến trang đăng nhập hoặc xử lý thông báo lỗi khác
+                return RedirectToAction("Login", "TaiKhoan"); // Thay "Login" và "Account" bằng tên action và controller thực tế của trang đăng nhập
+            }
             var userid = HttpContext.Session.GetString("MaTk");
             var a = _context.KhachHangs.FirstOrDefault(x => x.Matk == userid);
             if (userid == null)
