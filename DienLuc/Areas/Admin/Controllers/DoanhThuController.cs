@@ -64,32 +64,39 @@ namespace DienLuc.Areas.Admin.Controllers
                 .Where(x => x.NgayTao.Date >= startdate && x.NgayTao.Date <= endDate)
                 .ToList();
 
-            var daThanhToanCount = hoadons.Count(x => x.TrangThai == "Đã thanh toán");
+            var daThanhToanThuanCount = hoadons.Count(x => x.TrangThai == "Đã thanh toán" && (x.SoTienCanThanhToan - x.SoTienDaThanhToan) == 0);
             var chuaThanhToanCount = hoadons.Count(x => x.TrangThai == "Chưa thanh toán");
+            var conNoCount = hoadons.Count(x => x.TrangThai == "Đã thanh toán" && (x.SoTienCanThanhToan - x.SoTienDaThanhToan) != 0);
 
-            ViewBag.DaThanhToanCount = daThanhToanCount;
+            ViewBag.DaThanhToanThuanCount = daThanhToanThuanCount;
             ViewBag.ChuaThanhToanCount = chuaThanhToanCount;
+            ViewBag.ConNoCount = conNoCount;
             ViewBag.HoaDons = hoadons;
 
             // Chuẩn bị dữ liệu cho biểu đồ
             var chartData = new
             {
-                labels = new[] { "Đã thanh toán", "Chưa thanh toán" },
-                data = new[] { daThanhToanCount, chuaThanhToanCount }
+                labels = new[] { "Hóa đơn đã thanh toán", "Hóa đơn chưa thanh toán" },
+                datasets = new[]
+                {
+            new { label = "Còn nợ", data = new[] { conNoCount, 0 }, backgroundColor = "rgba(255, 206, 86, 0.2)", borderColor = "rgba(255, 206, 86, 1)" },
+            new { label = "Đã thanh toán", data = new[] { daThanhToanThuanCount, 0 }, backgroundColor = "rgba(75, 192, 192, 0.2)", borderColor = "rgba(75, 192, 192, 1)" },
+            new { label = "Chưa thanh toán", data = new[] { 0, chuaThanhToanCount }, backgroundColor = "rgba(255, 99, 132, 0.2)", borderColor = "rgba(255, 99, 132, 1)" }
+        }
             };
 
-            // Kiểm tra xem có đủ dữ liệu để vẽ biểu đồ không
-            if (daThanhToanCount > 0 || chuaThanhToanCount > 0)
-            {
-                ViewBag.ChartData = chartData;
-            }
-            else
-            {
-                ViewBag.ChartData = null;
-            }
+            ViewBag.ChartData = chartData;
 
             return PartialView("LietKe", hoadons);
         }
+
+
+
+
+
+
+
+
 
         [HttpGet("DoanhThuThang")]
         public IActionResult DoanhThuThang()

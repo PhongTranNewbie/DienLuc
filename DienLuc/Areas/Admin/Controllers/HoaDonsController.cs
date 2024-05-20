@@ -519,13 +519,19 @@ namespace DienLuc.Areas.Admin.Controllers
             int pageSize = 2;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
 
-            IQueryable<HoaDon> hoaDons = _context.HoaDons.Include(h => h.MaChiTietSddienNavigation.MaDhNavigation);
+            IQueryable<HoaDon> hoaDons = _context.HoaDons.Include(h => h.MaChiTietSddienNavigation.MaDhNavigation.MaKhNavigation);
+            // Lấy các hóa đơn mới nhất cho mỗi đồng hồ còn nợ
+            IQueryable<HoaDon> hd = _context.HoaDons
+                .Where(h => (h.SoTienCanThanhToan - h.SoTienDaThanhToan) != 0 && h.TrangThai == "Đã thanh toán")
+                .GroupBy(h => h.MaChiTietSddienNavigation.MaDhNavigation.MaDh)
+                .Select(g => g.OrderByDescending(h => h.NgayTao).FirstOrDefault());
 
             // Kiểm tra và lọc theo trạng thái nếu có giá trị truyền vào
             if (!string.IsNullOrEmpty(trangThai))
             {
-                hoaDons = hoaDons.Where(h => h.TrangThai == trangThai);
+                hoaDons = hoaDons.Where(h => h.TrangThai == trangThai || hd.Contains(h));
             }
+            
 
             // Kiểm tra và lọc theo ngày nếu có giá trị truyền vào
             if (fromDate != null)
