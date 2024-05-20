@@ -28,9 +28,11 @@
             <div class="form-group">
                 <label asp-for="TrangThai" class="control-label">Trạng thái</label>
                 <select asp-for="TrangThai" class="form-control">
+                    <option value="">Tất cả</option>
                     <option value="Đang hoạt động">Đang hoạt động</option>
                     <option value="Đã tạm dừng hoạt động">Đã tạm dừng hoạt động</option>
                     <option value="Đã hỏng">Đã hỏng</option>
+                    <option value="Đã hủy sử dụng dịch vụ">Đã hủy sử dụng dịch vụ</option>
                 </select>
                 <span asp-validation-for="TrangThai" class="text-danger"></span>
             </div>
